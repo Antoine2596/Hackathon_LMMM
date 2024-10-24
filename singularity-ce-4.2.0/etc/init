@@ -1,0 +1,23 @@
+# This will be sourced before launching a Singularity container.
+# Any variables prefixed with "SINGULARITYENV_" will be transposed
+# properly into the container. For example:
+# SINGULARITYENV_LD_LIBRARY_PATH -> LD_LIBRARY_PATH
+
+# Environment modules if set, cause errors in containers
+unset module
+unset ml
+
+# Bash env has been known to cause issues in containers
+unset BASH_ENV
+
+# Provide a sane path within the container
+if [ -z ${SINGULARITYENV_PATH+x} ]; then
+    SINGULARITYENV_PATH="/usr/local/bin:/usr/local/sbin:/bin:/sbin:/usr/bin:/usr/sbin"
+else
+    SINGULARITYENV_PATH="$SINGULARITYENV_PATH:/usr/local/bin:/usr/local/sbin:/bin:/sbin:/usr/bin:/usr/sbin"
+fi
+
+# Don't save the shell's HISTFILE
+SINGULARITYENV_HISTFILE=""
+
+export SINGULARITYENV_PATH SINGULARITYENV_HISTFILE

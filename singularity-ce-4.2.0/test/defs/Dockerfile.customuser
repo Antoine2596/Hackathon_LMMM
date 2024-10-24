@@ -1,0 +1,9 @@
+FROM alpine
+
+RUN addgroup -g 2000 -S testgroup && adduser -u 2000 -S testuser -G testgroup
+
+USER testuser
+
+WORKDIR /home/testuser
+
+CMD /usr/bin/id
