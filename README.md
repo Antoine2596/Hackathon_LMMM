@@ -621,3 +621,88 @@ done
 
 # Bien, on a plein de nouveaux dossiers, je vais les déplacer dans "fastqc"
 
+# Je regarde les résultats pour une seule séquence 
+more fastqc/mini_SRR10379721_fastqc/fastqc_data.txt
+
+#>>Overrepresented sequences     warn
+#Sequence       Count   Percentage      Possible Source
+#TGTTTATCACTTTTCATGATGCGAAACCTATCGATAAACTACACACGTAGAAAGATGTGTATCAG       1900.76     No Hit
+#ATGCCCGAAGGTTATGTACAGGAACGCACTATATCTTTCAAAGATGACGGGAACTACAAGACGCG       67 0.268    No Hit
+#AGCGTGACCACATGGTCCTTCTTGAGTTTGTAACTGCTGCTGGGATTACACATGGCATGGATGAG       66 0.264    No Hit
+#GCCCGAAGGTTATGTACAGGAACGCACTATATCTTTCAAAGATGACGGGAACTACAAGACGCGTG       64 0.256    No Hit
+#AATAACTGCAGTTAAGCCGAATTCGGCTTACGCGTCGACTAGGGAGGTTTTAAACATGATTAAAG       60 0.24     No Hit
+#AGGAGTGATTTCAATGGCACAAGATATCATTTCAACAATCGGTGACTTAGTAAAATGGATTATCG       57 0.22799999999999998      No Hit
+
+# On observe que la première séquence ici est présente 1900 fois, ce qui est bien plus élevé que les autres séquences présentent 60 fois maximum
+
+
+# Pour ajouter du poids sur la théorie que cette séquence serait une séquence artificielle, nous allons faire un blast contre cette séquence pour voir si elle est présente chez d'autres.
+# TGTTTATCACTTTTCATGATGCGAAACCTATCGATAAACTACACACGTAGAAAGATGTGTATCAG
+
+# blast via nr
+# la séquence est présentes chez staphylocoques, possiblement naturellement
+# Pour l'instant on va se dire qu'il s'agit de la séquence artificielle
+
+# On va voir chez une autres séquences
+more fastqc/mini_SRR10379722_fastqc/fastqc_data.txt
+
+# On a également des séquences sureprésenté tel que 
+# AATAACTGCAGTTAAGCCGAATTCGGCTTACGCGTCGACTAGGGAGGTTTTAAACATGATTAAAG présente 1190 fois
+# Peut-être qu'il s'agissent toute de séquences artificielles ? faudra-t-il toute les trimmer ?
+
+
+# En lisant la listes des séquencess dites sureprésentées, j'observe que pour cette deuxième séquence : 
+>>Overrepresented sequences     warn
+#Sequence       Count   Percentage      Possible Source
+#AATAACTGCAGTTAAGCCGAATTCGGCTTACGCGTCGACTAGGGAGGTTTTAAACATGATTAAAG       1190.47600000000000003      No Hit
+#TGTTTATCACTTTTCATGATGCGAAACCTATCGATAAACTACACACGTAGAAAGATGTGTATCAG       88 0.35200000000000004      No Hit
+#AGCGTGACCACATGGTCCTTCTTGAGTTTGTAACTGCTGCTGGGATTACACATGGCATGGATGAG       82 0.328    No Hit
+#ACTTTTTCAAGAGTGCCATGCCCGAAGGTTATGTACAGGAACGCACTATATCTTTCAAAGATGAC       74 0.296    No Hit
+#GGTGATGCAACATACGGAAAACTTACCCTTAAATTTATTTGCACTACTGGAAAACTACCTGTTCC       73 0.292    No Hit
+#GCCAACTTACTTCTGACAACGATCGGAGGACCGAAGGAGCTAACCGCTTTTTTGCACAACATGGG       68 0.272    No Hit
+#TCGCACTAACATCTAAGAATCAACATCAAGTATTATATTAACATCATAGATAACTTCATCAAGAC       62 0.248    No Hit
+#ATGCCCGAAGGTTATGTACAGGAACGCACTATATCTTTCAAAGATGACGGGAACTACAAGACGCG       61 0.244    No Hit
+#ACAGGGCACCCACCTGTATATAACAGGCCGAATGATCAAGCTATTATAACTACGGCAATACGGAC       60 0.24     No Hit
+#ATGGCATGGATGAGCTCTACAAATAACTGCAGTTAAGCCGAATTCGGCTTACGCGTCGACTAGGG       58 0.232    No Hit
+#GCCCGAAGGTTATGTACAGGAACGCACTATATCTTTCAAAGATGACGGGAACTACAAGACGCGTG       51 0.20400000000000001      No Hit
+#GTATTTTTGCGAAGTCTGCCCAAAGCACGTAGTGTTTGAAGATTTCGGTCCTATGCAATATGAAC       50 0.2      No Hit
+
+# La deuxième séquence sureprésenté ici est idententique à la première de la séquence précédente, cela est possible puisqu'il s'agit de la même espèce, mais peut-être que toutes les séquences ici sont des adapters, en tout cas c'est soit oui pour tous, soit non pour tous.
+
+# Pour la 3ème séquences :
+more fastqc/mini_SRR10379723_fastqc/fastqc_data.txt
+
+>>Overrepresented sequences     warn
+#Sequence       Count   Percentage      Possible Source
+#TGTTTATCACTTTTCATGATGCGAAACCTATCGATAAACTACACACGTAGAAAGATGTGTATCAG       1460.584    No Hit
+#AATAACTGCAGTTAAGCCGAATTCGGCTTACGCGTCGACTAGGGAGGTTTTAAACATGATTAAAG       1160.464    No Hit
+#ATGCCCGAAGGTTATGTACAGGAACGCACTATATCTTTCAAAGATGACGGGAACTACAAGACGCG       1040.416    No Hit
+#GCCAACTTACTTCTGACAACGATCGGAGGACCGAAGGAGCTAACCGCTTTTTTGCACAACATGGG       1010.404    No Hit
+#AGCGTGACCACATGGTCCTTCTTGAGTTTGTAACTGCTGCTGGGATTACACATGGCATGGATGAG       98 0.392    No Hit
+#GCCCGAAGGTTATGTACAGGAACGCACTATATCTTTCAAAGATGACGGGAACTACAAGACGCGTG       97 0.388    No Hit
+#ACTTTTTCAAGAGTGCCATGCCCGAAGGTTATGTACAGGAACGCACTATATCTTTCAAAGATGAC       76 0.304    No Hit
+#TCGGACACAAACTCGAGTACAACCATAACTCACACAATGTATACATCACGGCAGACAAACAAAAG       71 0.28400000000000003      No Hit
+#ATGGCATGGATGAGCTCTACAAATAACTGCAGTTAAGCCGAATTCGGCTTACGCGTCGACTAGGG       67 0.268    No Hit
+#GAGTTTGTAACTGCTGCTGGGATTACACATGGCATGGATGAGCTCTACAAATAACTGCAGTTAAG       64 0.256    No Hit
+#TCGCACTAACATCTAAGAATCAACATCAAGTATTATATTAACATCATAGATAACTTCATCAAGAC       54 0.216    No Hit
+#TTAAAGGAGAAGAACTTTTCACTGGAGTTGTCCCAATTCTTGTTGAATTAGATGGTGATGTTAAT       54 0.216    No Hit
+#TTTACCAGACAACCATTACCTGTCGACACAATCTGCCCTTTCGAAAGATCCCAACGAAAAGCGTG       53 0.212    No Hit
+#GGATTGTTAAGGGTTCCGAGGCTCAACGTCAATAAAGCAATTGGAATAAAGAAGCGAAAAAGGAG       49 0.196    No Hit
+
+# On a plusieurs séquences qui sont présentent plus de 1000 fois dont les deux qui étaient premières pour 21 et 22.
+
+# Pour la 4ème séquence : c'est TGTTTATCACTTTTCATGATGCGAAACCTATCGATAAACTACACACGTAGAAAGATGTGTATCAG qui est la seul présente plus de 100 fois avec une présence de 2040 fois.
+# Pour la 5ème séquence
+more fastqc/mini_SRR10379725_fastqc/fastqc_data.txt
+# On a TGTTTATCACT.. qui est la plus présente, mais accompagné d'autres séquences, 
+# et la séquence qui était la plus (et la seule) présente pour la seq 22 n'est pas présente ici.
+
+ 
+# Bon, il semblerait qui y a plusieurs séqeunces adaptateurs différentes pour toute nos séquences étudiée, donc je vais devoir toute les enlever, j'espère que cutadapt peut me prendre une liste de séqunece à enelver.
+
+# Ok je crois qu'avec -a on peut également mettre un fichier selon leur site web de la docu
+
+# Je fais faire une liste de toute les séquences sureprésentés présentent au moins 50 fois
+
+# nano ADAPTERS.txt
+	
