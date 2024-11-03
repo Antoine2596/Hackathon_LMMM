@@ -795,3 +795,10 @@ damona list
 
 # Je viens de créer une image via bioconda, mais la version n'est pas disponible, je dois trouver un autre moyen
 # La version est disponible sous sourceForge https://sourceforge.net/projects/bowtie-bio/files/bowtie/
+bash scripts/mapping.sh # et il l'installe
+# Bien, mtn je fais un index via le genome via bowtie build
+# Je fais utiliser le fna, on a que ça donc autant essayre
+
+singularity exec bowtie_v0.12.7.sif bowtie-build genome/ncbi_dataset/data/GCF_000013425.1/GCF_000013425.1_ASM1342v1_genomic.fna bowtie_index/index
+# on obtient 6 fichiers index ebwt
+
