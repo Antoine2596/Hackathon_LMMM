@@ -579,7 +579,11 @@ chmod +x datasets dataformat
 '''
 
 #############################
+
+
 # On refait tout à partir du trimming inclu
+
+
 #############################
 
 # Créer l'image cutadapt version 1.11 (article)
@@ -588,3 +592,19 @@ sudo singularity build cutadapt_v1.11.sif def_files/install_cutAdapt.def
 # Tester si ça marche
 singularity exec cutadapt_v1.11.sif cutadapt --version
 # 1.11
+
+# Maintenant que ça marche, on va via fastq tenté d'indentifier les séquences artificielles
+
+
+##########################
+#        Fastqc
+##########################
+
+sudo apt install fastqc
+fastqc mini_data/*
+
+
+mv mini_data/*zip fastqc/
+mv mini_data/*html fastqc/
+
+
