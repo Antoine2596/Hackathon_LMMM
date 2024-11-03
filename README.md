@@ -731,3 +731,21 @@ more fastqc/mini_SRR10379725_fastqc/fastqc_data.txt
 
 # Les séquences sont identiques (j'ai vérifier pour les 10 premières séquences avec succès)
 
+# le fichier fomarté et le fichier non formaté sont présentent dans le dossier fastqc
+
+###############################################################
+
+#                    TRIMMING
+
+###############################################################
+
+# Selon la docu, je dois faire cette commande
+
+# cutadapt -a file:adapters.fasta -o output.fastq input.fastq
+
+# singularity exec cutadapt_v1.11.sif cutadapt -a file:fastqc/formated_ADAPTERS.fasta -o trimming/output.fastq.gz  mini_data/mini_SRR10379721.fastq.gz
+je vais  faire encore une boucle pour le faire avec chaque
+
+./trimming.sh
+
+# Le script fait le trim pour tous et déponse dans le dossier trimming
