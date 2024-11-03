@@ -607,4 +607,17 @@ fastqc mini_data/*
 mv mini_data/*zip fastqc/
 mv mini_data/*html fastqc/
 
+# faut décompresser les fichiers zip, je n'arrive étrangement pas avec gzip donc je vais voir les forums
+# https://askubuntu.com/questions/86849/how-to-unzip-a-zip-file-from-the-terminal
+
+
+sudo apt-get install unzip
+
+for file in fastqc/*zip; do
+	filename=$(basename "$file")
+	unzip "$file"
+	echo "$file décompréssé"
+done
+
+# Bien, on a plein de nouveaux dossiers, je vais les déplacer dans "fastqc"
 
