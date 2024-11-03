@@ -1,0 +1,21 @@
+Bootstrap: docker
+From: ubuntu:20.04
+
+%post
+    # Maj dépendences & installaer unzip car j'ai pas trouver d'autres façon pour décomprésser
+    apt-get update && apt-get install -y wget unzip
+
+    # Pour l'instant je fais des cd mais peut-être que faut pas
+    mkdir -p /opt/bowtie2
+    cd /opt/bowtie2
+
+    # teléchargement de la version voulu sur sourceforge
+    wget https://sourceforge.net/projects/bowtie-bio/files/bowtie/0.12.7/bowtie-0.12.7-linux-x86_64.zip
+    unzip bowtie-0.12.7-linux-x86_64.zip
+    rm bowtie-0.12.7-linux-x86_64.zip
+
+%environment
+    export PATH="/opt/bowtie2/bowtie-0.12.7:$PATH"
+
+%runscript
+    exec bowtie2 "$@"

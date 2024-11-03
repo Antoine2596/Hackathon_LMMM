@@ -749,3 +749,49 @@ je vais  faire encore une boucle pour le faire avec chaque
 ./trimming.sh
 
 # Le script fait le trim pour tous et déponse dans le dossier trimming
+
+###############################################################
+
+#                 TELECHARGEMENT DU GENOME
+
+###############################################################
+
+
+mkdir genome
+wget "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/GCF_000013425.1/download?include_annotation_type=GENOME_FASTA&include_annotation_type=GENOME_GFF&include_annotation_type=RNA_FASTA&include_annotation_type=CDS_FASTA&include_annotation_type=PROT_FASTA&include_annotation_type=SEQUENCE_REPORT&hydrated=FULLY_HYDRATED" -O genome/GCF_000013425.1.zip
+
+unzip GCF_000013425.1.zip
+
+# On a un fichier fna
+# On va pouvoir passer à la suite
+
+#############################################################
+
+#                   MAPPING
+
+#############################################################
+
+
+# Installer bowtie
+
+./script/install_bowtie.sh
+
+# ouais bof le script ne marche qu'à moitié on dirait
+
+if [ ! -f  "~/.config/damona/damona.sh" ] ; then
+        source ~/.config/damona/damona.sh
+fi
+
+damona --version
+# damona, version 0.14.3
+
+damona create BOWTIE
+damona activate BOWTIE
+damona list 
+# aie aie aie, on a pas la version de l'article "0.12.7"
+
+# construction d'une image pour bowtie
+# installation via docker hub
+
+# Je viens de créer une image via bioconda, mais la version n'est pas disponible, je dois trouver un autre moyen
+# La version est disponible sous sourceForge https://sourceforge.net/projects/bowtie-bio/files/bowtie/
