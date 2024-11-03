@@ -706,3 +706,28 @@ more fastqc/mini_SRR10379725_fastqc/fastqc_data.txt
 
 # nano ADAPTERS.txt
 	
+# Selon la docu, chaque séquence doit être précédé d'un ">..."
+# Afin de formater le fichier txt et enlevé les doublons, j'utilise l'IA Claud pour formater le fichier.
+# Voici le prompt que j'ai utiliser en mettant en pièce jointe mon fichier ADAPTERS.txt
+
+###################################################################
+#voici mon fichier, je veux que avant chaque séquence du mette un ">adapter1[X]" où [X] est un nombre. Et je veux que tu enlèves les doublons.
+#voici ce que je veux en exemple : 
+#fdsfdsfsd
+#fsdfezrez
+#zerzrzzrz
+#
+#devient 
+#
+#>adapter1
+#fdsfdsfsd
+#>adapter2
+#fsdfezrez
+#>adapter3
+#zerzrzzrz
+####################################################################
+
+# J'obtients un fichier formaté par Claud et je vérifie si les séquences on bien était écrites, pour cela je vérifie via ctr+f sur vscode les séquences de l'IA sont bien les mêmes que les séquences initiales.
+
+# Les séquences sont identiques (j'ai vérifier pour les 10 premières séquences avec succès)
+
