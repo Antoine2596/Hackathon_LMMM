@@ -577,3 +577,14 @@ curl -o datasets 'https://ftp.ncbi.nlm.nih.gov/pub/datasets/command-line/v2/linu
 curl -o dataformat 'https://ftp.ncbi.nlm.nih.gov/pub/datasets/command-line/v2/linux-amd64/dataformat'
 chmod +x datasets dataformat
 '''
+
+#############################
+# On refait tout à partir du trimming inclu
+#############################
+
+# Créer l'image cutadapt version 1.11 (article)
+sudo singularity build cutadapt_v1.11.sif def_files/install_cutAdapt.def
+	
+# Tester si ça marche
+singularity exec cutadapt_v1.11.sif cutadapt --version
+# 1.11
