@@ -1,3 +1,0 @@
-^\.circleci/
-^e2e/
-^go\.mod$
