@@ -1,0 +1,23 @@
+Bootstrap: docker
+From: ubuntu:20.04
+# https://github.com/ShiLab-Bioinformatics/subread#readme
+%post
+    apt-get update
+    apt-get install -y wget tar    
+    wget https://sourceforge.net/projects/subread/files/subread-1.4.6-p3/subread-1.4.6-p3-Linux-x86_64.tar.gz/download -O subread_v0.12.7.tar.gz
+	
+    tar -xzf subread_v0.12.7.tar.gz
+
+    rm subread_v0.12.7.tar.gz
+
+    mv subread-1.4.6-p3-Linux-x86_64 /opt/subread
+
+    echo 'export PATH="/opt/subread/bin:$PATH"' >> /etc/profile
+
+
+%environment
+    export PATH="/opt/subread/bin:$PATH"
+
+
+%runscript
+    exec featureCounts "$@"

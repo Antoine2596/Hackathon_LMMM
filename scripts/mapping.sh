@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# prérequis : avoir le génome (fna file)
+# output : les sam
+
+
 if test -f bowtie_v0.12.7.sif; then
   echo "File exists."
 else
@@ -9,6 +13,8 @@ fi
 
 #singularity exec bowtie_v0.12.7.sif bowtie
 
+# créer l'index
+singularity exec bowtie_v0.12.7.sif bowtie-build genome/ncbi_dataset/data/GCF_000013425.1/GCF_000013425.1_ASM1342v1_genomic.fna bowtie_files/bowtie_index/index
 # apt-get install unzip
 
 for file in mini_data/*; do

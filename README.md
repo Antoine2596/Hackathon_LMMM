@@ -802,3 +802,21 @@ bash scripts/mapping.sh # et il l'installe
 singularity exec bowtie_v0.12.7.sif bowtie-build genome/ncbi_dataset/data/GCF_000013425.1/GCF_000013425.1_ASM1342v1_genomic.fna bowtie_index/index
 # on obtient 6 fichiers index ebwt
 
+# Installation de subread v0.12.7p-3 (manuellement)
+# (voir docu https://github.com/ShiLab-Bioinformatics/subread?tab=readme-ov-file#readme)
+wget https://sourceforge.net/projects/subread/files/subread-1.4.6-p3/subread-1.4.6-p3-Linux-x86_64.tar.gz/download -O subread_v0.12.7.tar.gz
+
+tar -xzf subread_v0.12.7.tar.gz
+cd subread-1.4.6-p3-Linux-x86_64/
+export PATH="$PWD/bin:$PATH"
+echo 'export PATH="$HOME/Hackathon_LMMM/subread-1.4.6-p3-Linux-x86_64/bin:$PATH"' >> ~/.bashrc
+
+source ~/.bashrc
+
+# Comme pour l'autre package je dois mettre dans opt
+
+featureCounts -v
+# featureCounts v1.4.6-p3
+
+
+
