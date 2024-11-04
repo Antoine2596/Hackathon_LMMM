@@ -11,12 +11,12 @@ fi
 
 singularity exec featureCounts_v1.4.6-p3.sif featureCounts -v
 
-annotation_gff="genome/ncbi_dataset/data/GCF_000013425.1/genomic.gff"
+annotation_gtf="genome/ncbi_dataset/data/GCF_000013425.1/genomic_exons.gtf"
 
 for sam_file in bowtie_files/*sam; do
 	echo "$sam_file"
 	filename=$(basename "$sam_file" ".sam")
 	echo "$filename"
-	singularity exec featureCounts_v1.4.6-p3.sif featureCounts -p -t exon -g gene_id -F gff -a "$annotation_gff" -o featureCounts_files/"$filename"_counts.txt "$sam_file"
+	singularity exec featureCounts_v1.4.6-p3.sif featureCounts -t exon -g gene_id -a "$annotation_gtf" -o featureCounts_files/"$filename"_counts.txt "$sam_file"
 	echo -e "\n doed"
 done

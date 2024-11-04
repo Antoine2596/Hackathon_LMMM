@@ -819,4 +819,35 @@ featureCounts -v
 # featureCounts v1.4.6-p3
 
 
+# J'ai réussi à créer des fichiers txt via featureCount, cependant le gff (au lieu à gtf) semble ne pazs être reconnu
+# Je dois donc convertir de gff en gtf
+# https://www.biostars.org/p/45791/
+# gffread doit pouvoir faire cela
+
+conda install -c bioconda gffread
+# conda est déjà activé mon bro
+
+gffread
+gffread genome/ncbi_dataset/data/GCF_000013425.1/genomic.gff -O -o genome/ncbi_dataset/data/GCF_000013425.1/genomic.gtf
+# it's work but i dont know if it's a real gft file
+# but i think it gud because i have already seen a file like that
+
+
+# OK bud, it's also work but same result :
+#Status  bowtie_files/mini_SRR10379726.sam
+#Assigned        0
+#Unassigned_Ambiguity    0
+#Unassigned_MultiMapping 0
+#Unassigned_NoFeatures   0
+#Unassigned_Unmapped     0
+#Unassigned_MappingQuality       0
+#Unassigned_FragmentLength       0
+#Unassigned_Chimera      0
+#Unassigned_Secondary    0
+#Unassigned_Nonjunction  0
+#Unassigned_Duplicate    0
+
+# wtf man	
+
+gffread genome/ncbi_dataset/data/GCF_000013425.1/genomic.gtf -T -o genome/ncbi_dataset/data/GCF_000013425.1/genomic_exons.gtf
 

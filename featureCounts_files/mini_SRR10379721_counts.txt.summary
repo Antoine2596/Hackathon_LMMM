@@ -1,9 +1,9 @@
 Status	bowtie_files/mini_SRR10379721.sam
-Assigned	0
-Unassigned_Ambiguity	0
+Assigned	54
+Unassigned_Ambiguity	113
 Unassigned_MultiMapping	0
-Unassigned_NoFeatures	0
-Unassigned_Unmapped	0
+Unassigned_NoFeatures	15700
+Unassigned_Unmapped	9133
 Unassigned_MappingQuality	0
 Unassigned_FragmentLength	0
 Unassigned_Chimera	0
