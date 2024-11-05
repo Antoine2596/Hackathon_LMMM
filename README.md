@@ -851,3 +851,16 @@ gffread genome/ncbi_dataset/data/GCF_000013425.1/genomic.gff -O -o genome/ncbi_d
 
 gffread genome/ncbi_dataset/data/GCF_000013425.1/genomic.gtf -T -o genome/ncbi_dataset/data/GCF_000013425.1/genomic_exons.gtf
 
+###########################################
+
+#         SIF SRA-TOOLS
+
+############################################
+
+# faut faire un apt update & un install de wget & tar
+
+wget -O data.tar.gz https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/3.1.1/sratoolkit.3.1.1-ubuntu64.tar.gz
+
+
+tar -zxvf data.tar.gz sratoolkit.3.1.1-ubuntu64/
+
