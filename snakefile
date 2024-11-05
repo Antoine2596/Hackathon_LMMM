@@ -25,6 +25,8 @@ rule download_fastq:
         "genome/GCF_000013425.1.fna"    #permet de télécharger d'abord la référence car implique obligatoirement d'avoir le fichier pour commencer le téléchargement
     output:
         "fastq/{sample}.fastq"      #pareil, mise des fichiers dans le répertoire "fastq"
+    container:
+	# ajout de l'adresse vers la recette .def singularity (avoir la recette dans un fichier def sur github)
     shell:
         """
         fasterq-dump {wildcards.sample} -O fastq/ --mem 8 --threads 3 
@@ -32,9 +34,10 @@ rule download_fastq:
 
 #{wildcards.sample} va récupérer les éléments de "sample.txt" pour les remplacer dans la commande
 #shell que snakemake va faire.
-#lancer le workflow : snakemake -j 2 
+#lancer le workflow : snakemake -j 2 --use-singularity
 #"-j 2" lui dit de lancer deux tâches en parallèle, c'est à dire qu'il va télécharger les fichiers
 #deux par deux tout seul : une parallélisation simple !
+# --use-singularity c'est pour dire que faut utiliser singularity
 
 
 
