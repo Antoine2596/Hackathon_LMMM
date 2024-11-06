@@ -1,0 +1,25 @@
+Bootstrap: docker
+From: ubuntu:20.04
+# https://github.com/ShiLab-Bioinformatics/subread#readme
+%post
+    apt-get update
+    apt-get install -y wget tar    
+
+    wget -O data.tar.gz https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/3.1.1/sratoolkit.3.1.1-ubuntu64.tar.gz
+    tar -zxvf data.tar.gz        
+    
+	
+
+    rm data.tar.gz
+
+    mv sratoolkit.3.1.1-ubuntu64 /opt/sratools
+
+    echo 'export PATH="/opt/sratools/bin:$PATH"' >> /etc/profile
+
+
+%environment
+    export PATH="/opt/sratools/bin:$PATH"
+
+
+%runscript
+    exec fasterq-dump "$@"

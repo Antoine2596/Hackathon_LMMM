@@ -1,0 +1,18 @@
+Bootstrap: docker
+From: continuumio/miniconda3
+
+%post
+    # rien de plus que la docu
+    conda update -n base -c defaults conda -y
+    conda config --add channels bioconda
+    conda config --add channels conda-forge
+    conda config --set channel_priority strict
+
+    conda create -n cutadapt_env cutadapt=1.11 -y
+
+%environment
+    export CONDA_DEFAULT_ENV=cutadapt_env
+    export PATH="/opt/conda/envs/cutadapt_env/bin:$PATH"
+
+%runscript
+    exec cutadapt "$@"
