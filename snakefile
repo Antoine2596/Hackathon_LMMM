@@ -50,8 +50,6 @@ rule bowtie:
 
 # Règle pour télécharger les fichiers FASTQ
 rule download_fastq:
-    input:
-        "genome/GCF_000013425.1.fna"    # Permet de télécharger d'abord la référence car implique obligatoirement d'avoir le fichier pour commencer le téléchargement
     output:
         "fastq/{sample}.fastq"      # Pareil, mise des fichiers dans le répertoire "fastq"
     container:
