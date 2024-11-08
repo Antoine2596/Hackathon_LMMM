@@ -27,15 +27,12 @@ rule all:
 # Règle pour télécharger le génome de référence
 rule download_genome:
     output:
-        fna="genome/GCF_000013425.1.fna",  #mise des fichiers dans le répertoire "genome"
-        gff="genome/annotations.gff"
-    container:
-        "./sif_files/SRATOOLKIT.sif"  # Chemin vers votre image .sif
+        fasta="genome/reference_genome.fasta",  #mise des fichiers dans le répertoire "genome"
+        gff="genome/reference_annotations.gff"
     shell:
         """ 
-        wget  -O genome/GCF_000013425.1.zip "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/GCF_000013425.1/download?include_annotation_type=GENOME_FASTA&include_annotation_type=GENOME_GFF&include_annotation_type=RNA_FASTA&include_annotation_type=CDS_FASTA&include_annotation_type=PROT_FASTA&include_annotation_type=SEQUENCE_REPORT&hydrated=FULLY_HYDRATED"
-        unzip -p genome/GCF_000013425.1.zip > {output.fna}    #attention !! il faut l'installer car il n'est apparemment pas là par défaut
-        unzip -p genome/GCF_000013425.1.zip  ncbi_dataset/data/GCF_000013425.1/genomic.gff > {output.gff}
+        wget -q -O {output.fasta} "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=CP000253.1&rettype=fasta"
+        wget -O {output.gff} "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=CP000253.1"
         """
 
 # Règle pour l'indexation du génome de référence
