@@ -30,6 +30,8 @@ rule download_genome:
     output:
         fasta="genome/reference_genome.fasta",  #mise des fichiers dans le répertoire "genome"
         gff="genome/reference_annotations.gff"
+    container:
+        "./sif_files/SRATOOLKIT.sif"  # Utilisation du fichier image .sif
     shell:
         """ 
         wget -q -O {output.fasta} "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=CP000253.1&rettype=fasta"
@@ -54,7 +56,7 @@ rule download_fastq:
     output:
         "fastq/{sample}.fastq"      # Pareil, mise des fichiers dans le répertoire "fastq"
     container:
-        "./sif_files/install_SRATOOLKIT.sif"  # Utilisation du fichier image .sif
+        "./sif_files/SRATOOLKIT.sif"  # Utilisation du fichier image .sif
     shell:
         "fasterq-dump {wildcards.sample} -O fastq/ --mem 8 --threads 3"
 
