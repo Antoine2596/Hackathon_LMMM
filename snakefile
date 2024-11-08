@@ -15,7 +15,8 @@ SAMPLES = [line.strip() for line in open("samples.txt")]
 # TODO 1 : modifier input une fois la version pré-finale du snakefile réalisé.
 rule all:
     input:
-        "genome/GCF_000013425.1.fna",  # Génome de référence
+        "genome/reference_genome.fasta",  # Génome de référence
+        "genome/reference_annotations.gff",
         expand("fastq/{sample}.fastq", sample=SAMPLES),  # Fichiers FASTQ
         expand("minidata/mini_{sample}.fastq.gz", sample=SAMPLES),  # Données réduites
         # Ajouter les fichiers de sortie finaux des autres règles ici
@@ -38,7 +39,7 @@ rule download_genome:
 # Règle pour l'indexation du génome de référence
 rule bowtie:
     input:
-        "genome/GCF_000013425.1.fna"
+        "genome/reference_genome.fasta"
     output:
         "bowtie_files/bowtie_index/index"
     container:
@@ -55,7 +56,9 @@ rule download_fastq:
     container:
         "./sif_files/SRATOOLKIT.sif"  # Utilisation du fichier image .sif
     shell:
-        """fasterq-dump {wildcards.sample} -O fastq/ --mem 8 --threads 3"""
+        """
+        fasterq-dump {wildcards.sample} -O fastq/ --mem 8 --threads 3
+        """
 
 # règle qui est voué a disparaitre avec le temps
 # règle de création de minidata
