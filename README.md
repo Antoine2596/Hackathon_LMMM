@@ -27,7 +27,7 @@ sed -i -e 's/,/\t/g' csv.csv
 sudo rm -rf /usr/local/go
 sudo rm -rf ~/singularity-ce-4.2.0
 
-#lancer les scripts de la docu (juste du copier-coller)
+# lancer les scripts de la docu (juste du copier-coller)
 sudo apt-get update
 
 sudo apt-get install -y    autoconf    automake    cryptsetup    fuse2fs    git    fuse    libfuse-dev    libglib2.0-dev    libseccomp-dev    libtool    pkg-config    runc    squashfs-tools    squashfs-tools-ng    uidmap    wget    zlib1g-dev
