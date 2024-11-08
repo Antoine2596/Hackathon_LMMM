@@ -115,8 +115,8 @@ rule mapping:
     container:
         "./sif_files/bowtie_v0.12.7.sif"
     shell:
-    """unzip -c {input.trimmed_fastq}
-    bowtie -q -S {input.bowtie_index} - > {output}"""
+        """unzip -c {input.trimmed_fastq}
+        bowtie -q -S {input.bowtie_index} - > {output}"""
 
 
 
