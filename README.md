@@ -758,7 +758,7 @@ je vais  faire encore une boucle pour le faire avec chaque
 
 
 mkdir genome
-wget "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/GCF_000013425.1/download?include_annotation_type=GENOME_FASTA&include_annotation_type=GENOME_GFF&include_annotation_type=RNA_FASTA&include_annotation_type=CDS_FASTA&include_annotation_type=PROT_FASTA&include_annotation_type=SEQUENCE_REPORT&hydrated=FULLY_HYDRATED" -O genome/GCF_000013425.1.zip
+wget "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/accession/GCF_000013425.1/download?include_annotation_type=GENOME_FASTA&include_annotation_type=GENOME_GFF&include_annotation_type=RNA_FASTA&include_annotation_type=CDS_FASTA&include_annotation_type=PROT_FASTA&include_annotation_type=SEQUENCE_REPORT&hydrated=FULLY_HYDRATED" -O genome/GCF_000013425.1.zipGCF_000013425
 
 unzip GCF_000013425.1.zip
 
