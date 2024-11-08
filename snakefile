@@ -46,7 +46,7 @@ rule bowtie:
     shell:
         # Note : le chemin d'entrée et de sortie pourrait nécessiter une adaptation en fonction des fichiers exacts.
         # TODO 3 : Vérifier le chemin d'accès pour éviter les erreurs
-        """bowtie-build bowtie-build {input} {output}"""
+        """bowtie-build {input} {output}"""
 
 # Règle pour télécharger les fichiers FASTQ
 rule download_fastq:
@@ -75,8 +75,8 @@ rule minidata:
         head -n 100000 {input} > minidata/mini_{sample}.fastq.tmp  # temporairement stocké avant compression
         gzip {output}.tmp -c > {output}
         rm {output}.tmp
-        echo "fichier {input} réduit et compressé à {output}
-        """"
+        echo "fichier {input} réduit et compressé à {output}"
+        """
 
 
 
