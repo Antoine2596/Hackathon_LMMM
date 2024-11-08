@@ -56,7 +56,7 @@ rule download_fastq:
     container:
         "./sif_files/SRATOOLKIT.sif"  # Utilisation du fichier image .sif
     shell:
-        """fasterq-dump {wildcards.sample} -O fastq/ --mem 8 --threads 3 --details --progress"""
+        """fasterq-dump {sample} -O fastq/ --mem 8 --threads 3 --details --progress"""
 
 # règle qui est voué a disparaitre avec le temps
 # règle de création de minidata
