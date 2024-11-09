@@ -146,5 +146,5 @@ rule mapping:
 
 
 # Commandes pour exécuter le workflow :
-# - Pour exécuter le workflow avec deux tâches en parallèle : `snakemake -j 2 --use-singularity`
-# - Le paramètre `-j 2` permet la parallélisation, et `--use-singularity` indique d'utiliser Singularity pour chaque conteneur spécifié.
+# - Pour exécuter le workflow avec deux tâches en parallèle : `snakemake --cores all --use-singularity`
+# - Le paramètre `-cores all` permet la parallélisation, et `--use-singularity` indique d'utiliser Singularity pour chaque conteneur spécifié.
