@@ -20,7 +20,7 @@ rule all:
         expand("fastq/{sample}.fastq", sample=SAMPLES),  # Fichiers FASTQ
         expand("minidata/mini_{sample}.fastq.gz", sample=SAMPLES),  # Données réduites
         # Ajouter les fichiers de sortie finaux des autres règles ici
-        "bowtie_files/bowtie_index/index",  # Index de Bowtie
+        "bowtie_files/bowtie_index/index.*.ebwt",  # Index de Bowtie
         # "trimming/{sample}.fastq.gz",   # si output cutAdapt
         # "bowtie_files/{sample}.sam",    # si output mapping
         # Compléter ici avec les autres fichiers finaux requis
@@ -107,7 +107,7 @@ rule cutAdapt:
 rule mapping:
     input:
         trimmed_fastq="trimming/{sample}.fastq.gz",  # Sortie de la règle cutAdapt
-        bowtie_index="bowtie_files/bowtie_index/index"  # Sortie de la règle bowtie
+        bowtie_index="bowtie_files/bowtie_index/index.*.ebwt"  # Sortie de la règle bowtie
     output:
         "bowtie_files/{sample}.sam"
         # A readapter
