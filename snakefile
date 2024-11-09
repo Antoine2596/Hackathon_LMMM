@@ -20,7 +20,8 @@ rule all:
         expand("fastq/{sample}.fastq", sample=SAMPLES),  # Fichiers FASTQ
         expand("minidata/mini_{sample}.fastq.gz", sample=SAMPLES),  # Données réduites
         # Ajouter les fichiers de sortie finaux des autres règles ici
-        "bowtie_files/bowtie_index/index.*.ebwt",  # Index de Bowtie
+        expand("bowtie_files/bowtie_index/index.{n}.ebwt", n=[1,2,3,4]), #index de bowtie
+        expand("bowtie_files/bowtie_index/index.rev.{n}.ebwt", n=[1,2]),
         # "trimming/{sample}.fastq.gz",   # si output cutAdapt
         # "bowtie_files/{sample}.sam",    # si output mapping
         # Compléter ici avec les autres fichiers finaux requis
@@ -43,7 +44,8 @@ rule bowtie:
     input:
         "genome/reference_genome.fasta"
     output:
-        "bowtie_files/bowtie_index/index.*.ebwt"
+        expand("bowtie_files/bowtie_index/index.{n}.ebwt", n=[1, 2, 3, 4]),
+        expand("bowtie_files/bowtie_index/index.rev.{n}.ebwt", n=[1, 2])
     container:
         "./sif_files/bowtie_v0.12.7.sif"
     shell:
