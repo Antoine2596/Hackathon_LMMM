@@ -43,13 +43,13 @@ rule bowtie:
     input:
         "genome/reference_genome.fasta"
     output:
-        "bowtie_files/bowtie_index/index"
+        "bowtie_files/bowtie_index/index.*.ebwt"
     container:
         "./sif_files/bowtie_v0.12.7.sif"
     shell:
         # Note : le chemin d'entrée et de sortie pourrait nécessiter une adaptation en fonction des fichiers exacts.
         # TODO 3 : Vérifier le chemin d'accès pour éviter les erreurs
-        """bowtie-build {input} {output}"""
+        """bowtie-build {input} bowtie_files/bowtie_index/index"""
 
 # Règle pour télécharger les fichiers FASTQ
 rule download_fastq:
