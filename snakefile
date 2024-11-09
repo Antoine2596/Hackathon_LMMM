@@ -73,9 +73,9 @@ rule minidata:
         "./sif_files/SRATOOLKIT.sif"
     shell :
         """
-        head -n 100000 {input} > minidata/mini_{sample}.fastq.tmp  # temporairement stocké avant compression
-        gzip {output}.tmp -c > {output}
-        rm {output}.tmp
+        head -n 100000 {input} > minidata/mini_{wildcards.sample}.fastq.tmp  # temporairement stocké avant compression
+        gzip minidata/mini_{wildcards.sample}.fastq.tmp -c > minidata/mini_{wildcards.sample}.fastq.gz
+        rm minidata/mini_{wildcards.sample}.fastq.tmp
         echo "fichier {input} réduit et compressé à {output}"
         """
 
