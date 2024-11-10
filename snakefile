@@ -20,7 +20,8 @@ rule all:
         expand("fastq/{sample}.fastq", sample=SAMPLES),  # Fichiers FASTQ
         expand("minidata/mini_{sample}.fastq.gz", sample=SAMPLES),  # Données réduites
         # Ajouter les fichiers de sortie finaux des autres règles ici
-        "bowtie_files/bowtie_index/index",  # Index de Bowtie
+        expand("bowtie_files/bowtie_index/index.{n}.ebwt", n=[1,2,3,4]), #index de bowtie
+        expand("bowtie_files/bowtie_index/index.rev.{n}.ebwt", n=[1,2]),
         # "trimming/{sample}.fastq.gz",   # si output cutAdapt
         # "bowtie_files/{sample}.sam",    # si output mapping
         # Compléter ici avec les autres fichiers finaux requis
@@ -43,13 +44,14 @@ rule bowtie:
     input:
         "genome/reference_genome.fasta"
     output:
-        "bowtie_files/bowtie_index/index"
+        expand("bowtie_files/bowtie_index/index.{n}.ebwt", n=[1, 2, 3, 4]),
+        expand("bowtie_files/bowtie_index/index.rev.{n}.ebwt", n=[1, 2])
     container:
         "./sif_files/bowtie_v0.12.7.sif"
     shell:
         # Note : le chemin d'entrée et de sortie pourrait nécessiter une adaptation en fonction des fichiers exacts.
         # TODO 3 : Vérifier le chemin d'accès pour éviter les erreurs
-        """bowtie-build {input} {output}"""
+        """bowtie-build {input} bowtie_files/bowtie_index/index"""
 
 # Règle pour télécharger les fichiers FASTQ
 rule download_fastq:
@@ -71,9 +73,9 @@ rule minidata:
         "./sif_files/SRATOOLKIT.sif"
     shell :
         """
-        head -n 100000 {input} > minidata/mini_{sample}.fastq.tmp  # temporairement stocké avant compression
-        gzip {output}.tmp -c > {output}
-        rm {output}.tmp
+        head -n 100000 {input} > minidata/mini_{wildcards.sample}.fastq.tmp  # temporairement stocké avant compression
+        gzip minidata/mini_{wildcards.sample}.fastq.tmp -c > minidata/mini_{wildcards.sample}.fastq.gz
+        rm minidata/mini_{wildcards.sample}.fastq.tmp
         echo "fichier {input} réduit et compressé à {output}"
         """
 
@@ -107,7 +109,7 @@ rule cutAdapt:
 rule mapping:
     input:
         trimmed_fastq="trimming/{sample}.fastq.gz",  # Sortie de la règle cutAdapt
-        bowtie_index="bowtie_files/bowtie_index/index"  # Sortie de la règle bowtie
+        bowtie_index="bowtie_files/bowtie_index/index.*.ebwt"  # Sortie de la règle bowtie
     output:
         "bowtie_files/{sample}.sam"
         # A readapter
@@ -146,5 +148,5 @@ rule mapping:
 
 
 # Commandes pour exécuter le workflow :
-# - Pour exécuter le workflow avec deux tâches en parallèle : `snakemake -j 2 --use-singularity`
-# - Le paramètre `-j 2` permet la parallélisation, et `--use-singularity` indique d'utiliser Singularity pour chaque conteneur spécifié.
+# - Pour exécuter le workflow avec deux tâches en parallèle : `snakemake --cores all --use-singularity`
+# - Le paramètre `-cores all` permet la parallélisation, et `--use-singularity` indique d'utiliser Singularity pour chaque conteneur spécifié.
