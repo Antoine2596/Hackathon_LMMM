@@ -113,7 +113,7 @@ rule cutAdapt:
         "./sif_files/cutAdapt.sif"
     shell:
         """
-        cutadapt -a file:fastqc/formated_ADAPTERS.fasta -o {output} {input}   
+        cutadapt -q 20 -m 25 -o {output} {input}
         """
         # A READAPTER !!!
    
