@@ -17,12 +17,14 @@ rule all:
     input:
         "genome/reference_genome.fasta",  # Génome de référence
         "genome/reference_annotations.gff",
-        expand("fastq/{sample}.fastq", sample=SAMPLES),  # Fichiers FASTQ
-        expand("minidata/mini_{sample}.fastq.gz", sample=SAMPLES),  # Données réduites
+        expand("fastq/{sample}.fastq.gz", sample=SAMPLES),  # Fichiers FASTQ
+        #expand("minidata/mini_{sample}.fastq.gz", sample=SAMPLES),  # Données réduites
         # Ajouter les fichiers de sortie finaux des autres règles ici
         expand("bowtie_files/bowtie_index/index.{n}.ebwt", n=[1,2,3,4]), #index de bowtie
         expand("bowtie_files/bowtie_index/index.rev.{n}.ebwt", n=[1,2]),
-        # "trimming/{sample}.fastq.gz",   # si output cutAdapt
+        #expand("featureCounts_files/{sample}_count.txt", sample=SAMPLES),
+        #expand("featureCounts_files/{sample}_count.txt.summary", sample=SAMPLES)
+        expand("trimming/{sample}.fastq.gz", sample=SAMPLES)   # si output cutAdapt
         # "bowtie_files/{sample}.sam",    # si output mapping
         # Compléter ici avec les autres fichiers finaux requis
 
@@ -62,22 +64,37 @@ rule download_fastq:
     shell:
         "fasterq-dump {wildcards.sample} -O fastq/ --mem 8 --threads 3"
 
-# règle qui est voué a disparaitre avec le temps
-# règle de création de minidata
-rule minidata:
+#regle compression fastq
+rule compress_fastq:
     input : 
         "fastq/{sample}.fastq"
     output : 
-        "minidata/mini_{sample}.fastq.gz"
+        "fastq/{sample}.fastq.gz"
     container : 
         "./sif_files/SRATOOLKIT.sif"
     shell :
         """
-        head -n 100000 {input} > minidata/mini_{wildcards.sample}.fastq.tmp  # temporairement stocké avant compression
-        gzip minidata/mini_{wildcards.sample}.fastq.tmp -c > minidata/mini_{wildcards.sample}.fastq.gz
-        rm minidata/mini_{wildcards.sample}.fastq.tmp
+        gzip fastq/{wildcards.sample}.fastq -c > fastq/{wildcards.sample}.fastq.gz
+        rm fastq/{wildcards.sample}.fastq
         echo "fichier {input} réduit et compressé à {output}"
         """
+
+# règle qui est voué a disparaitre avec le temps
+# règle de création de minidata
+#rule minidata:
+#    input : 
+#        "fastq/{sample}.fastq"
+#    output : 
+#        "minidata/mini_{sample}.fastq.gz"
+#    container : 
+#        "./sif_files/SRATOOLKIT.sif"
+#    shell :
+#        """
+#        head -n 100000 {input} > minidata/mini_{wildcards.sample}.fastq.tmp  # temporairement stocké avant compression
+#        gzip minidata/mini_{wildcards.sample}.fastq.tmp -c > minidata/mini_{wildcards.sample}.fastq.gz
+#        rm minidata/mini_{wildcards.sample}.fastq.tmp
+#        echo "fichier {input} réduit et compressé à {output}"
+#        """
 
 
 
@@ -88,7 +105,7 @@ rule minidata:
 # Règle pour le prétraitement des fichiers FASTQ (minidata) (trim des séquences)
 rule cutAdapt:
     input:
-        "minidata/mini_{sample}.fastq.gz"
+        "fastq/{sample}.fastq.gz"
     output:
         "trimming/{sample}.fastq.gz"
         # a réadapter !!!
@@ -126,18 +143,18 @@ rule mapping:
 # # Une fois qu'on a les fichiers attendus, faut penser a adapter (input/output)
 # # pour une exécution fluide.
 
-# # Règle pour compter les caractéristiques (gènes/exons) dans les données alignées
-# rule featurecount:
+ # Règle pour compter les caractéristiques (gènes/exons) dans les données alignées
+#rule featurecount:
 #     input:
-#         # output de la regle mapping ,
+#         "bowtie_files/{sample}.sam",
 #         "genome/annotations.gff"
 #     output:
-#         # à trouver 
+#         "featureCounts_files/{sample}_count.txt",
+#         "featureCounts_files/{sample}_count.txt.summary"
 #     container:
 #         "./sif_files/install_featureCount.sif"
 #     shell:
-#         """annotation_gtf="genome/ncbi_dataset/data/GCF_000013425.1/genomic_exons.gtf"
-        
+#         """annotation_gtf="genome/ncbi_dataset/data/GCF_000013425.1/genomic_exons.gtf"       
 #         for sam_file in bowtie_files/*sam; do
 #             echo "$sam_file"
 #             filename=$(basename "$sam_file" ".sam")
