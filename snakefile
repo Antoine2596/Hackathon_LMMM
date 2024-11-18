@@ -126,7 +126,8 @@ rule cutAdapt:
 rule mapping:
     input:
         trimmed_fastq="trimming/{sample}.fastq.gz",  # Sortie de la règle cutAdapt
-        bowtie_index="bowtie_files/bowtie_index/index.*.ebwt"  # Sortie de la règle bowtie
+        expand("bowtie_files/bowtie_index/index.{n}.ebwt", n=[1, 2, 3, 4]),
+        expand("bowtie_files/bowtie_index/index.rev.{n}.ebwt", n=[1, 2])
     output:
         "bowtie_files/{sample}.sam"
         # A readapter
