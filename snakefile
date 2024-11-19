@@ -24,7 +24,7 @@ rule all:
         #expand("featureCounts_files/{sample}_count.txt", sample=SAMPLES),
         #expand("featureCounts_files/{sample}_count.txt.summary", sample=SAMPLES)
         expand("trimming/{sample}.fastq.gz", sample=SAMPLES),   # si output cutAdapt
-        expand("bowtie_files/{sample}.sam", sample=SAMPLES)   # si output mapping
+        expand("bowtie_files/{sample}.sam", sample=SAMPLES),   # si output mapping
         # Compléter ici avec les autres fichiers finaux requis
 
 # Règle pour télécharger le génome de référence
@@ -124,7 +124,7 @@ rule cutAdapt:
 rule mapping:
     input:
         trimmed_fastq="trimming/{sample}.fastq.gz",  # Sortie de la règle cutAdapt
-        bowtie_index=expand("bowtie_files/bowtie_index/index.{suffix}.ebwt", suffix=["1", "2", "3", "4", "rev.1", "rev.2"])
+        bowtie_index="bowtie_files/bowtie_index/index"
     output:
         "bowtie_files/{sample}.sam"
         # A readapter
