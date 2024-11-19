@@ -24,7 +24,7 @@ rule all:
         #expand("featureCounts_files/{sample}_count.txt", sample=SAMPLES),
         #expand("featureCounts_files/{sample}_count.txt.summary", sample=SAMPLES)
         expand("trimming/{sample}.fastq.gz", sample=SAMPLES),   # si output cutAdapt
-        expand("bowtie_files/{sample}.sam", sample=SAMPLES),   # si output mapping
+        expand("bowtie_files/{sample}.sam", sample=SAMPLES)   # si output mapping
         # Compléter ici avec les autres fichiers finaux requis
 
 # Règle pour télécharger le génome de référence
