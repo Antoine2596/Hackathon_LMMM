@@ -20,8 +20,7 @@ rule all:
         expand("fastq/{sample}.fastq.gz", sample=SAMPLES),  # Fichiers FASTQ
         #expand("minidata/mini_{sample}.fastq.gz", sample=SAMPLES),  # Données réduites
         # Ajouter les fichiers de sortie finaux des autres règles ici
-        expand("bowtie_files/bowtie_index/index.{n}.ebwt", n=[1,2,3,4]), #index de bowtie
-        expand("bowtie_files/bowtie_index/index.rev.{n}.ebwt", n=[1,2]),
+        bowtie_index=expand("bowtie_files/bowtie_index/index.{suffix}.ebwt", suffix=["1", "2", "3", "4", "rev.1", "rev.2"]),
         #expand("featureCounts_files/{sample}_count.txt", sample=SAMPLES),
         #expand("featureCounts_files/{sample}_count.txt.summary", sample=SAMPLES)
         expand("trimming/{sample}.fastq.gz", sample=SAMPLES),   # si output cutAdapt
@@ -46,8 +45,7 @@ rule bowtie:
     input:
         "genome/reference_genome.fasta"
     output:
-        expand("bowtie_files/bowtie_index/index.{n}.ebwt", n=[1, 2, 3, 4]),
-        expand("bowtie_files/bowtie_index/index.rev.{n}.ebwt", n=[1, 2])
+        bowtie_index=expand("bowtie_files/bowtie_index/index.{suffix}.ebwt", suffix=["1", "2", "3", "4", "rev.1", "rev.2"])
     container:
         "./sif_files/bowtie_v0.12.7.sif"
     shell:
@@ -126,7 +124,7 @@ rule cutAdapt:
 rule mapping:
     input:
         trimmed_fastq="trimming/{sample}.fastq.gz",  # Sortie de la règle cutAdapt
-        bowtie_index="bowtie_files/bowtie_index/index"
+        bowtie_index=expand("bowtie_files/bowtie_index/index.{suffix}.ebwt", suffix=["1", "2", "3", "4", "rev.1", "rev.2"])
     output:
         "bowtie_files/{sample}.sam"
         # A readapter
