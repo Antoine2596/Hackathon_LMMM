@@ -24,8 +24,8 @@ rule all:
         expand("bowtie_files/bowtie_index/index.rev.{n}.ebwt", n=[1,2]),
         #expand("featureCounts_files/{sample}_count.txt", sample=SAMPLES),
         #expand("featureCounts_files/{sample}_count.txt.summary", sample=SAMPLES)
-        expand("trimming/{sample}.fastq.gz", sample=SAMPLES)   # si output cutAdapt
-        # "bowtie_files/{sample}.sam",    # si output mapping
+        expand("trimming/{sample}.fastq.gz", sample=SAMPLES),   # si output cutAdapt
+        expand("bowtie_files/{sample}.sam", sample=SAMPLES),   # si output mapping
         # Compléter ici avec les autres fichiers finaux requis
 
 # Règle pour télécharger le génome de référence
@@ -133,8 +133,9 @@ rule mapping:
     container:
         "./sif_files/bowtie_v0.12.7.sif"
     shell:
-        """unzip -c {input.trimmed_fastq}
-        bowtie -q -S {input.bowtie_index} - > {output}"""
+        """gunzip -c {input.trimmed_fastq} > temp.fastq
+        bowtie -q -S {input.bowtie_index} temp.fastq > {output}
+        rm temp.fastq"""
 
 
 
