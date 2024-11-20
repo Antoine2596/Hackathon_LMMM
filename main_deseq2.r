@@ -68,13 +68,29 @@ normalized_counts <- counts(dds, normalized=TRUE)
 
 View(normalized_counts)
 
-# res <- results(dds, alpha = 0.05) # alpha 0.05 par dépit
-# plotMA(res)
+#Transformation en log
+logNormalizedCounts <- log2(normalized_counts + 1)
 
-# browseVignettes("EnrichmentBrowser")
+#Affichage du résultat log
+limma::plotMA(logNormalizedCounts)
+abline(h=0)
 
-# kegg.gs <- getGenesets(org = "hsa", db = "kegg")
+#Affichage du résultat mean
+res <- results(dds, alpha = 0.05) # alpha 0.05 par dépit
+plotMA(
+  object = res,
+  colSig = "red",
+  colNonSig = "black"
+ )
 
+#Download gene names + pathways
+browseVignettes("EnrichmentBrowser")
+kegg.gs <- getGenesets(org = "hsa", db = "kegg")
+length(kegg.gs)
+kegg.gs[1:2]
+
+sbea.res <- sbea(method = "ora", se = normalized_counts, gs = kegg.gs, perm = 0, alpha = 0.05) 
+gsRanking(sbea.res)
 
 # aureus <- downloadPathways(
 #     org = "sao",
