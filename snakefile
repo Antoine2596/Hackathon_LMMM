@@ -3,6 +3,7 @@
 # Amélioration 1 : Optimisation des ressources
 # Ajouter des directives `resources` (mémoire, threads) et des benchmarks 
 # pour chaque règle pour améliorer l'efficacité et faciliter la parallélisation
+#+ ajouter parallélisation partout où c'est possible  : zip/dézip (avec pigz), cutadapt, bowtie si possible
 
 # Amélioration 2 : Utilisation des wildcards
 # Utiliser `{wildcards.sample}` dans les noms de fichiers pour adapter le workflow 
@@ -22,10 +23,10 @@ rule all:
         #expand("minidata/mini_{sample}.fastq.gz", sample=SAMPLES),  # Données réduites
         # Ajouter les fichiers de sortie finaux des autres règles ici
         expand("bowtie_files/bowtie_index/index.{suffix}.ebwt", suffix=SUFFIX),
-        #expand("featureCounts_files/{sample}_count.txt", sample=SAMPLES),
-        #expand("featureCounts_files/{sample}_count.txt.summary", sample=SAMPLES)
         expand("trimming/{sample}.fastq.gz", sample=SAMPLES),   # si output cutAdapt
-        expand("bowtie_files/{sample}.sam", sample=SAMPLES)   # si output mapping
+        expand("mapping/{sample}.sam", sample=SAMPLES),   # si output mapping
+        expand("featureCounts_files/{sample}_count.txt", sample=SAMPLES),
+        expand("featureCounts_files/{sample}_count.txt.summary", sample=SAMPLES)
         # Compléter ici avec les autres fichiers finaux requis
 
 # Règle pour télécharger le génome de référence
@@ -62,7 +63,7 @@ rule download_fastq:
     container:
         "./sif_files/SRATOOLKIT.sif"  # Utilisation du fichier image .sif
     shell:
-        "fasterq-dump {wildcards.sample} -O fastq/ --mem 8 --threads 3"
+        "fasterq-dump {wildcards.sample} -O fastq/ --mem 14 --threads 4"   #ajuster à terme
 
 #regle compression fastq
 rule compress_fastq:
@@ -115,7 +116,7 @@ rule cutAdapt:
         """
         cutadapt -q 20 -m 25 -o {output} {input}
         """
-        # A READAPTER !!!
+        # A READAPTER !!! -> avec multithreading par exemple pour accélérer
    
 
 # il y aura des des erreurs d’exécution ou de dépendances non résolues.
@@ -126,18 +127,18 @@ rule cutAdapt:
 rule mapping:
     input:
         trimmed_fastq="trimming/{sample}.fastq.gz",  # Sortie de la règle cutAdapt
-        bowtie_index="bowtie_files/bowtie_index/index"
+        bowtie_index=expand("bowtie_files/bowtie_index/index.{ext}", ext=["1.ebwt", "2.ebwt", "3.ebwt", "4.ebwt", "rev.1.ebwt", "rev.2.ebwt"])
     output:
-        "bowtie_files/{sample}.sam"
-        # A readapter
+        sam="mapping/{sample}.sam"
+    threads:
+        4
     container:
         "./sif_files/bowtie_v0.12.7.sif"
     shell:
-        """gunzip -c {input.trimmed_fastq} > temp.fastq
-        bowtie -q -S {input.bowtie_index} temp.fastq > {output}
-        rm temp.fastq"""
-
-
+        """
+        gunzip -c {input.trimmed_fastq} | bowtie -q -S -p {threads} bowtie_files/bowtie_index/index - {output.sam}
+        """
+    #c'est mis sur 4 coeurs/exécution (-p {threads})
 
 
 # # il y aura des des erreurs d’exécution ou de dépendances non résolues.
@@ -145,24 +146,22 @@ rule mapping:
 # # pour une exécution fluide.
 
  # Règle pour compter les caractéristiques (gènes/exons) dans les données alignées
-#rule featurecount:
-#     input:
-#         "bowtie_files/{sample}.sam",
-#         "genome/annotations.gff"
-#     output:
-#         "featureCounts_files/{sample}_count.txt",
-#         "featureCounts_files/{sample}_count.txt.summary"
-#     container:
-#         "./sif_files/install_featureCount.sif"
-#     shell:
-#         """annotation_gtf="genome/ncbi_dataset/data/GCF_000013425.1/genomic_exons.gtf"       
-#         for sam_file in bowtie_files/*sam; do
-#             echo "$sam_file"
-#             filename=$(basename "$sam_file" ".sam")
-#             echo "$filename"
-#             singularity exec featureCounts_v1.4.6-p3.sif featureCounts -t exon -g gene_id -a "$annotation_gtf" -o featureCounts_files/"$filename"_counts.txt "$sam_file"
-#             echo -e "\n doed"
-#         done"""
+rule featurecount:
+    input:
+        sam="mapping/{sample}.sam",  # Fichier SAM généré par bowtie
+        annotations="genome/reference_annotations.gff"  # Fichier GTF
+    output:
+        counts="featureCounts_files/{sample}_count.txt",  # Résultats des comptes
+        summary="featureCounts_files/{sample}_count.txt.summary"  # Résumé
+    threads:
+        4
+    container:
+        "./sif_files/featureCounts_v1.4.6-p3.sif"
+    shell:
+        """
+        featureCounts -T {threads} -t exon -g gene_id -a {input.annotations} -o {output.counts} {input.sam}
+        """
+    #pareil ici 4 threads
 
 
 # Commandes pour exécuter le workflow :
