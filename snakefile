@@ -30,10 +30,11 @@ rule all:
 # Règle pour télécharger le génome de référence
 rule download_genome:
     output:
-        fasta="genome/reference_genome.fasta",  #mise des fichiers dans le répertoire "genome"
-        gff="genome/reference_annotations.gff"
+        gff = "genome/reference_annotations.gff",
+        fasta = "genome/reference_genome.fasta"
+        
     container:
-        "./sif_files/SRATOOLKIT.sif"  # Utilisation du fichier image .sif
+        "./sif_files/SRATOOLKIT.sif"
     shell:
         """ 
         wget -q -O {output.fasta} "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=CP000253.1&rettype=fasta"
