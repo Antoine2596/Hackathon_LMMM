@@ -47,7 +47,7 @@ rule bowtie:
     input:
         "genome/reference_genome.fasta"
     output:
-        bowtie_index=expand("bowtie_files/bowtie_index/index.{suffix}.ebwt", suffix=["1", "2", "3", "4", "rev.1", "rev.2"])
+        bowtie_index=expand("bowtie_files/bowtie_index/index.{suffix}.ebwt", suffix=SUFFIX)
     container:
         "./sif_files/bowtie_v0.12.7.sif"
     shell:
@@ -126,7 +126,7 @@ rule cutAdapt:
 rule mapping:
     input:
         trimmed_fastq="trimming/{sample}.fastq.gz",  # Sortie de la règle cutAdapt
-        bowtie_index="bowtie_files/bowtie_index/index.{suffix}.ebwt"
+        bowtie_index=expand("bowtie_files/bowtie_index/index.{suffix}.ebwt", suffix=SUFFIX)
     output:
         "bowtie_files/{sample}.sam"
         # A readapter
@@ -134,7 +134,7 @@ rule mapping:
         "./sif_files/bowtie_v0.12.7.sif"
     shell:
         """gunzip -c {input.trimmed_fastq} > temp.fastq
-        bowtie -q -S {input.bowtie_index} temp.fastq > {output}
+        bowtie -q -S {wildcards.bowtie_index} temp.fastq > {output}
         rm temp.fastq"""
 
 
