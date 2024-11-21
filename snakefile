@@ -20,7 +20,7 @@ rule all:
         expand("fastq/{sample}.fastq.gz", sample=SAMPLES),  # Fichiers FASTQ
         #expand("minidata/mini_{sample}.fastq.gz", sample=SAMPLES),  # Données réduites
         # Ajouter les fichiers de sortie finaux des autres règles ici
-        bowtie_index=expand("bowtie_files/bowtie_index/index.{suffix}.ebwt", suffix=["1", "2", "3", "4", "rev.1", "rev.2"]),
+        expand("bowtie_files/bowtie_index/index.{suffix}.ebwt", suffix=["1", "2", "3", "4", "rev.1", "rev.2"]),
         #expand("featureCounts_files/{sample}_count.txt", sample=SAMPLES),
         #expand("featureCounts_files/{sample}_count.txt.summary", sample=SAMPLES)
         expand("trimming/{sample}.fastq.gz", sample=SAMPLES),   # si output cutAdapt
