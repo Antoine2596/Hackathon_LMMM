@@ -8,18 +8,23 @@ if (!require("BiocManager", quietly = TRUE))
 
 BiocManager::install("DESeq2")
 
+#Chargement des librairies
 library("DESeq2")
 library("EnrichmentBrowser")
 
+#chemin absolu d'accès au répertoire du dossier des feature_counts --> A MODIFIER ! 
 path <- "C:/Users/Melo/Downloads/"
 
-data_dir <- paste(path,"featureCounts_files", sep = "")
+#chemin absolu du dossier feature_counts --> NOM A MODIFIER !
+data_dir <- paste(path,"featureCounts_files_10M", sep = "")
 
+#Sélection des fichiers feature_counts dans une liste
 count_files <- list.files(
   data_dir, 
   pattern = "_counts.txt$", 
   full.names = TRUE)
 
+#Fonction permettant de lire et charger les fichiers feature_counts
 read_count_file <- function(file) {
   count_data <- read.table(
     file, header = TRUE, 
@@ -30,9 +35,12 @@ read_count_file <- function(file) {
   return(count_data)
 }
 
+#Application de la fonction sur les fichiers
 all_counts <- do.call(cbind, lapply(count_files, read_count_file))
+#Remplacement des colonnes par le nom de chacun des échantillons
 colnames(all_counts) <- gsub("_counts.txt", "", basename(count_files))
 
+#Construction de la liste des conditions
 conditions <- factor(rep(
   c(
     "persister",
@@ -40,6 +48,7 @@ conditions <- factor(rep(
     each = 3
     ))
 
+#Construction du dataframe associant chaque échantillon à sa condition (persister ou control)
 metadata <- data.frame(
   sample = colnames(all_counts),
   condition = conditions, 
@@ -59,6 +68,22 @@ View(counts(dds))
 
 #Perform median of ratios method of normalization
 dds <- DESeq(dds)
+res <- results(dds, alpha = 0.05) # alpha 0.05 par dépit
+
+#Affichage du résultat mean
+png(
+  filename = paste(
+    path,"Mean_of_normalized_counts_log_fold_change_.png"),
+    width = 1080, 
+    height = 1080)
+
+plotMA(
+  object = res,
+  colSig = "red",
+  colNonSig = "black"
+ )
+
+dev.off()
 
 #Normalization factor applied to each sample
 sizeFactors(dds)
@@ -71,17 +96,16 @@ View(normalized_counts)
 #Transformation en log
 logNormalizedCounts <- log2(normalized_counts + 1)
 
+png(
+  filename = paste(
+    path,"test_log_normalized_counts_log_fold_change.png"),
+    width = 1080, 
+    height = 1080)
+    
 #Affichage du résultat log
 limma::plotMA(logNormalizedCounts)
 abline(h=0)
-
-#Affichage du résultat mean
-res <- results(dds, alpha = 0.05) # alpha 0.05 par dépit
-plotMA(
-  object = res,
-  colSig = "red",
-  colNonSig = "black"
- )
+dev.off()
 
 #Download gene names + pathways
 browseVignettes("EnrichmentBrowser")
@@ -92,9 +116,8 @@ kegg.gs[1:2]
 sbea.res <- sbea(method = "ora", se = normalized_counts, gs = kegg.gs, perm = 0, alpha = 0.05) 
 gsRanking(sbea.res)
 
-# aureus <- downloadPathways(
-#     org = "sao",
-#     cache = TRUE,
-#     out.dir = NULL,
-#     zip = FALSE)
-
+aureus <- downloadPathways(
+    org = "hsa",
+    cache = TRUE,
+    out.dir = NULL,
+    zip = FALSE)
