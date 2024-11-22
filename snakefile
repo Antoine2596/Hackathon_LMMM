@@ -159,8 +159,9 @@ rule featurecount:
         "./sif_files/featureCounts_v1.4.6-p3.sif"
     shell:
         """
-        featureCounts -T {threads} -t exon -g gene_id -a {input.annotations} -o {output.counts} {input.sam}
+        featureCounts -T {threads} -t gene -g ID -s 1 -a {input.annotations} -o {output.counts} {input.sam}
         """
+    #featureCounts -T {threads} -t exon -g gene_id -a {input.annotations} -o {output.counts} {input.sam}
     #pareil ici 4 threads
 
 
