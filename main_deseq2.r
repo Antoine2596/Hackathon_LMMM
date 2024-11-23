@@ -8,9 +8,17 @@ if (!require("BiocManager", quietly = TRUE))
 
 BiocManager::install("DESeq2")
 
+BiocManager::install("org.Hs.eg.db")
+BiocManager::install("KEGGREST")
+BiocManager::install("AnnotationDbi")
+
 #Chargement des librairies
 library("DESeq2")
 library("EnrichmentBrowser")
+library("KEGGREST")
+library("AnnotationDbi")
+library("org.Hs.eg.db")
+
 
 #chemin absolu d'accès au répertoire du dossier des feature_counts --> A MODIFIER ! 
 path <- "C:/Users/Melo/Downloads/"
@@ -27,16 +35,19 @@ count_files <- list.files(
 #Fonction permettant de lire et charger les fichiers feature_counts
 read_count_file <- function(file) {
   count_data <- read.table(
-    file, header = TRUE, 
-    stringsAsFactors = FALSE, 
-    comment.char = "#")
+    file, 
+    header = TRUE, 
+    stringsAsFactors = FALSE,
+    comment.char = "#", 
+    sep = "\t")
   rownames(count_data) <- count_data$Geneid
-  count_data <- count_data[, ncol(count_data)]
+  count_data <- count_data[, ncol(count_data), drop = FALSE]
   return(count_data)
 }
 
 #Application de la fonction sur les fichiers
 all_counts <- do.call(cbind, lapply(count_files, read_count_file))
+
 #Remplacement des colonnes par le nom de chacun des échantillons
 colnames(all_counts) <- gsub("_counts.txt", "", basename(count_files))
 
@@ -70,10 +81,10 @@ View(counts(dds))
 dds <- DESeq(dds)
 res <- results(dds, alpha = 0.05) # alpha 0.05 par dépit
 
-#Affichage du résultat mean
+#Affichage du résultat mean (fig 3 supp)
 png(
   filename = paste(
-    path,"Mean_of_normalized_counts_log_fold_change_.png"),
+    path,"Mean_of_normalized_counts_log_fold_change_2.png"),
     width = 1080, 
     height = 1080)
 
@@ -85,39 +96,40 @@ plotMA(
 
 dev.off()
 
-#Normalization factor applied to each sample
-sizeFactors(dds)
-
-#Normalized counts matrix
-normalized_counts <- counts(dds, normalized=TRUE)
-
-View(normalized_counts)
-
-#Transformation en log
-logNormalizedCounts <- log2(normalized_counts + 1)
-
 png(
   filename = paste(
     path,"test_log_normalized_counts_log_fold_change.png"),
     width = 1080, 
     height = 1080)
     
-#Affichage du résultat log
-limma::plotMA(logNormalizedCounts)
-abline(h=0)
-dev.off()
+#Affichage du résultat log (fig 3) --> ICI QUE CA COINCE !!
+
+# # Conversion des IDs de gènes vers KEGG
+# entrez_ids <- mapIds(
+#   org.Hs.eg.db, 
+#   keys = rownames(res), 
+#   column = "ENSEMBL", 
+#   keytype = "SYMBOL", 
+#   multiVals = "first")
+
+# # Obtenir les annotations KEGG
+# kegg_annotations <- keggGet(paste0("sau:", rownames(res)))
+
+# limma::plotMA(logNormalizedCounts)
+# abline(h=0)
+# dev.off()
 
 #Download gene names + pathways
 browseVignettes("EnrichmentBrowser")
 kegg.gs <- getGenesets(org = "hsa", db = "kegg")
 length(kegg.gs)
-kegg.gs[1:2]
+length(kegg.gs["hsa05150_Staphylococcus_aureus_infection"])
 
-sbea.res <- sbea(method = "ora", se = normalized_counts, gs = kegg.gs, perm = 0, alpha = 0.05) 
+sbea.res <- sbea(method = "ora", se = res, gs = kegg.gs, perm = 0, alpha = 0.05) 
 gsRanking(sbea.res)
 
-aureus <- downloadPathways(
-    org = "hsa",
-    cache = TRUE,
-    out.dir = NULL,
-    zip = FALSE)
+# aureus <- downloadPathways(
+#     org = "hsa",
+#     cache = TRUE,
+#     out.dir = NULL,
+#     zip = FALSE)
