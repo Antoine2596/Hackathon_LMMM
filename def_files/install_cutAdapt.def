@@ -2,7 +2,6 @@ Bootstrap: docker
 From: continuumio/miniconda3
 
 %post
-    # rien de plus que la docu
     conda update -n base -c defaults conda -y
     conda config --add channels bioconda
     conda config --add channels conda-forge
