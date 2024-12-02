@@ -1,0 +1,59 @@
+Bootstrap: docker
+From: ubuntu:20.04
+
+%labels
+    Maintainer YourName
+    Version R-3.4.1
+
+%post
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update && apt-get upgrade -y
+
+    apt-get install -y tzdata
+    echo "Europe/Paris" > /etc/timezone
+    ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime
+    dpkg-reconfigure -f noninteractive tzdata
+
+    apt-get install -y \
+        wget \
+        build-essential \
+        gfortran \
+        libreadline-dev \
+        libcurl4-openssl-dev \
+        libssl-dev \
+        libxml2-dev \
+        libbz2-dev \
+        liblzma-dev \
+        libncurses5-dev \
+        libxt-dev \
+        libjpeg-dev \
+        libpng-dev \
+        libtiff5-dev \
+        texinfo \
+        texlive \
+        texlive-fonts-extra \
+        texlive-fonts-recommended \
+        zlib1g-dev \
+        libpcre3-dev \
+        make \
+        ca-certificates
+
+    wget https://cran.r-project.org/src/base/R-3/R-3.4.1.tar.gz
+    tar -xvzf R-3.4.1.tar.gz
+    cd R-3.4.1
+    ./configure --enable-R-shlib --with-x=yes
+    make
+    make install
+    cd ..
+    rm -rf R-3.4.1 R-3.4.1.tar.gz
+
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+
+%environment
+    export PATH=/usr/local/bin:$PATH
+    export R_HOME=/usr/local/lib/R
+
+%runscript
+    echo "Bienvenue dans l'image Singularity R 3.4.1"
+    exec R "$@"
