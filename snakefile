@@ -12,6 +12,7 @@
 # Chargement de la liste des échantillons depuis le fichier "samples.txt"
 SAMPLES = [line.strip() for line in open("samples.txt")]
 SUFFIX = ["1", "2", "3", "4", "rev.1", "rev.2"]
+CONTAIN = ["bowtie_v0.12.7","cutadapt_v1.11","featureCounts_v1.4.6-p3","R_v3.4.1"]
 
 # Définir la règle finale "all"
 # TODO 1 : modifier input une fois la version pré-finale du snakefile réalisé.
@@ -26,8 +27,20 @@ rule all:
         expand("trimming/{sample}.fastq.gz", sample=SAMPLES),   # si output cutAdapt
         expand("mapping/{sample}.sam", sample=SAMPLES),   # si output mapping
         expand("featureCounts_files/{sample}_count.txt", sample=SAMPLES),
-        expand("featureCounts_files/{sample}_count.txt.summary", sample=SAMPLES)
+        expand("featureCounts_files/{sample}_count.txt.summary", sample=SAMPLES),
+        expand("sif_files/{contain}.sif", contain=CONTAIN)
         # Compléter ici avec les autres fichiers finaux requis
+
+
+# Règle pour télécharger les conteneurs
+rule download_containers:
+    output:
+        "sif_files/{contain}.sif"
+    shell:
+        """
+        wget -O sif_files/{wildcards.contain}.sif "https://zenodo.org/records/14259426/files/{wildcards.contain}.sif?download=1"
+        """
+
 
 # Règle pour télécharger le génome de référence
 rule download_genome:
@@ -80,23 +93,6 @@ rule compress_fastq:
         echo "fichier {input} réduit et compressé à {output}"
         """
 
-# règle qui est voué a disparaitre avec le temps
-# règle de création de minidata
-#rule minidata:
-#    input : 
-#        "fastq/{sample}.fastq"
-#    output : 
-#        "minidata/mini_{sample}.fastq.gz"
-#    container : 
-#        "./sif_files/SRATOOLKIT.sif"
-#    shell :
-#        """
-#        head -n 100000 {input} > minidata/mini_{wildcards.sample}.fastq.tmp  # temporairement stocké avant compression
-#        gzip minidata/mini_{wildcards.sample}.fastq.tmp -c > minidata/mini_{wildcards.sample}.fastq.gz
-#        rm minidata/mini_{wildcards.sample}.fastq.tmp
-#        echo "fichier {input} réduit et compressé à {output}"
-#        """
-
 
 
 # il y aura des des erreurs d’exécution ou de dépendances non résolues.
@@ -111,7 +107,7 @@ rule cutAdapt:
         "trimming/{sample}.fastq.gz"
         # a réadapter !!!
     container:
-        "./sif_files/cutAdapt.sif"
+        "./sif_files/cutadapt_v1.11.sif"
     shell:
         """
         cutadapt -q 20 -m 25 -o {output} {input}
@@ -161,7 +157,6 @@ rule featurecount:
         """
         featureCounts -T {threads} -t gene -g ID -s 1 -a {input.annotations} -o {output.counts} {input.sam}
         """
-    #featureCounts -T {threads} -t exon -g gene_id -a {input.annotations} -o {output.counts} {input.sam}
     #pareil ici 4 threads
 
 
