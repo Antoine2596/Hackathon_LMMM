@@ -12,7 +12,7 @@
 # Chargement de la liste des échantillons depuis le fichier "samples.txt"
 SAMPLES = [line.strip() for line in open("samples.txt")]
 SUFFIX = ["1", "2", "3", "4", "rev.1", "rev.2"]
-CONTAIN = ["bowtie_v0.12.7","cutadapt_v1.11","featureCounts_v1.4.6-p3","R_v3.4.1"]
+CONTAIN = ["bowtie_v0.12.7","cutadapt_v1.11","featureCounts_v1.4.6-p3","R_v3.4.1", "SRAtoolkit"]
 
 # Définir la règle finale "all"
 # TODO 1 : modifier input une fois la version pré-finale du snakefile réalisé.
@@ -38,18 +38,19 @@ rule download_containers:
         "sif_files/{contain}.sif"
     shell:
         """
-        wget -O sif_files/{wildcards.contain}.sif "https://zenodo.org/records/14259426/files/{wildcards.contain}.sif?download=1"
+        wget -O sif_files/{wildcards.contain}.sif "https://zenodo.org/records/14261800/files/{wildcards.contain}.sif?download=1"
         """
 
 
 # Règle pour télécharger le génome de référence
 rule download_genome:
+    input:
+        "sif_files/SRAtoolkit.sif"
     output:
         gff = "genome/reference_annotations.gff",
         fasta = "genome/reference_genome.fasta"
-        
     container:
-        "./sif_files/SRATOOLKIT.sif"
+        "./sif_files/SRAtoolkit.sif"
     shell:
         """ 
         wget -q -O {output.fasta} "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=CP000253.1&rettype=fasta"
@@ -71,10 +72,12 @@ rule bowtie:
 
 # Règle pour télécharger les fichiers FASTQ
 rule download_fastq:
+    input:
+        "sif_files/SRAtoolkit.sif"
     output:
         "fastq/{sample}.fastq"      # Pareil, mise des fichiers dans le répertoire "fastq"
     container:
-        "./sif_files/SRATOOLKIT.sif"  # Utilisation du fichier image .sif
+        "./sif_files/SRAtoolkit.sif"  # Utilisation du fichier image .sif
     shell:
         "fasterq-dump {wildcards.sample} -O fastq/ --mem 14 --threads 4"   #ajuster à terme
 
@@ -85,7 +88,7 @@ rule compress_fastq:
     output : 
         "fastq/{sample}.fastq.gz"
     container : 
-        "./sif_files/SRATOOLKIT.sif"
+        "./sif_files/SRAtoolkit.sif"
     shell :
         """
         gzip fastq/{wildcards.sample}.fastq -c > fastq/{wildcards.sample}.fastq.gz
