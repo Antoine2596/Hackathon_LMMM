@@ -10,7 +10,7 @@
 # dynamiquement à chaque échantillon sans duplication de code.
 
 # Chargement de la liste des échantillons depuis le fichier "samples.txt"
-SAMPLES = [line.strip() for line in open("samples.txt")]
+SAMPLES = ["SRR10379724", "SRR10379725", "SRR10379726", "SRR10379723", "SRR10379722", "SRR10379721"]
 SUFFIX = ["1", "2", "3", "4", "rev.1", "rev.2"]
 CONTAIN = ["bowtie_v0.12.7","cutadapt_v1.11","featureCounts_v1.4.6-p3","R_v3.4.1", "SRAtoolkit"]
 
@@ -162,6 +162,7 @@ rule featurecount:
         """
     #pareil ici 4 threads
 
+#pour r : r [nom du fichier R]
 
 # Commandes pour exécuter le workflow :
 # - Pour exécuter le workflow avec deux tâches en parallèle : `snakemake --cores all --use-singularity`
