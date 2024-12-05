@@ -8,17 +8,18 @@ if (!require("BiocManager", quietly = TRUE))
 
 BiocManager::install("DESeq2")
 
-BiocManager::install("org.Hs.eg.db")
-BiocManager::install("KEGGREST")
-BiocManager::install("AnnotationDbi")
+install.packages("readxl")
+
+# BiocManager::install("org.Hs.eg.db")
+# BiocManager::install("AnnotationDbi")
 
 #Chargement des librairies
 library("DESeq2")
 library("EnrichmentBrowser")
-library("KEGGREST")
-library("AnnotationDbi")
-library("org.Hs.eg.db")
+library("readxl")
 
+# library("AnnotationDbi")
+# library("org.Hs.eg.db")
 
 #chemin absolu d'accès au répertoire du dossier des feature_counts --> A MODIFIER ! 
 path <- "C:/Users/Melo/Downloads/"
@@ -40,7 +41,11 @@ read_count_file <- function(file) {
     stringsAsFactors = FALSE,
     comment.char = "#", 
     sep = "\t")
+  # Supprimer le substring "gene-" des valeurs de "Geneid"
+  count_data$Geneid <- gsub("gene-", "", count_data$Geneid)
+  # Affecter "Geneid" comme noms des lignes
   rownames(count_data) <- count_data$Geneid
+  # Conserver uniquement la dernière colonne
   count_data <- count_data[, ncol(count_data), drop = FALSE]
   return(count_data)
 }
@@ -81,10 +86,10 @@ View(counts(dds))
 dds <- DESeq(dds)
 res <- results(dds, alpha = 0.05) # alpha 0.05 par dépit
 
-#Affichage du résultat mean (fig 3 supp)
+#Affichage du résultat mean (FIG 3 SUPP)
 png(
   filename = paste(
-    path,"Mean_of_normalized_counts_log_fold_change_2.png"),
+    path,"Mean_of_normalized_counts_log_fold_change.png"),
     width = 1080, 
     height = 1080)
 
@@ -95,38 +100,65 @@ plotMA(
  )
 
 dev.off()
-
-png(
-  filename = paste(
-    path,"test_log_normalized_counts_log_fold_change.png"),
-    width = 1080, 
-    height = 1080)
     
-#Affichage du résultat log (fig 3) --> ICI QUE CA COINCE !!
+#Affichage du résultat log (FIG 3)
 
-# # Conversion des IDs de gènes vers KEGG
-# entrez_ids <- mapIds(
-#   org.Hs.eg.db, 
-#   keys = rownames(res), 
-#   column = "ENSEMBL", 
-#   keytype = "SYMBOL", 
-#   multiVals = "first")
+#On obtient les informations générales sur les gènes de translation (mais il en manque, voir commentaires ci-dessous)
+# Source : https://www.genome.jp/kegg-bin/get_htext?sao00001.keg
+kegg_translation <- KEGGREST::keggGet(
+  c("sao03010","sao00970")
+  )
+#ajouter à la main "SAOUHSC_01203", "K03685" selon un collègue de promo
+#il manque peut-être aussi le code sao03012
+#kegg_sao03012 <- KEGGREST::keggGet("sao03012")
 
-# # Obtenir les annotations KEGG
-# kegg_annotations <- keggGet(paste0("sau:", rownames(res)))
+#permet de lister les identifiants des gènes de translation
+gene_ids <- unique(unlist(lapply(kegg_translation, function(x) x$GENE)))
 
+#filtrage sur le dataframe "res" à partir des id de gènes de translation
+res_filtered <- res[rownames(res) %in% gene_ids,]
+
+#fichier excel contenant les noms des gènes et s'ils sont t-RNA synthetase
+#Source : https://aureowiki.med.uni-greifswald.de/download_gene_specific_information
+gene_name_file_name = "GeneSpecificInformation_NCTC8325.xlsx"
+
+#Chargement du fichier excel
+genes_name_file <- read_excel(
+  paste(path,gene_name_file_name, sep = ""))
+
+#Ici, il faudrait réussir à intégrer une colonne avec le nom des gènes dans le dataframe "res"
+#mais je galère un peu....c'est ici Antoine que tu peux m'aider stp ?
+# Ci-dessous j'ai essayé la fonction "merge" par exemple, ça pourrait t'aider peut-être ? 
+
+res_final <- merge(
+  res_filtered, 
+  genes_name_file, 
+  by = )
+
+#Affichage de la figure 3 supp
+library(ggplot2)
+
+ggplot(res_filtered, aes(x = log_baseMean, y = log2FoldChange)) +
+  geom_point() +  # Ajouter des points
+  labs(x = "baseMean", y = "log2FoldChange") +  # Ajouter des labels aux axes
+  theme_minimal() +  # Appliquer un thème minimal
+  ggtitle("Graphique de baseMean vs log2FoldChange") # Ajouter un titre au graphique
+
+
+
+#------------------------------- à partir d'ici, c'est de l'ancien code ----------------------
 # limma::plotMA(logNormalizedCounts)
 # abline(h=0)
 # dev.off()
 
 #Download gene names + pathways
-browseVignettes("EnrichmentBrowser")
-kegg.gs <- getGenesets(org = "hsa", db = "kegg")
-length(kegg.gs)
-length(kegg.gs["hsa05150_Staphylococcus_aureus_infection"])
+# browseVignettes("EnrichmentBrowser")
+# kegg.gs <- getGenesets(org = "sao", db = "kegg")
+# length(kegg.gs)
+# kegg.gs["$sao05150_Staphylococcus_aureus_infection"]
 
-sbea.res <- sbea(method = "ora", se = res, gs = kegg.gs, perm = 0, alpha = 0.05) 
-gsRanking(sbea.res)
+# sbea.res <- sbea(method = "ora", se = res, gs = kegg.gs, perm = 0, alpha = 0.05) 
+# gsRanking(sbea.res)
 
 # aureus <- downloadPathways(
 #     org = "hsa",
