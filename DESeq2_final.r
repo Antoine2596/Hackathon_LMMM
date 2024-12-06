@@ -1,12 +1,12 @@
 #Vérification de la présence des bonnes librairies sinon installation 
 if (!require("BiocManager", quietly = TRUE)){
-   install.packages("BiocManager", version = '1.30.25')}
+   install.packages("BiocManager")}#, version = '1.30.25')}
 
 if (!require("EnrichmentBrowser", quietly = TRUE)){
    install.packages("EnrichmentBrowser", version = '2.36.0')}
 
 if (!require("DESeq2", quietly = TRUE)){
-   install.packages("DESeq2", version = '1.46.0')}
+   install.packages("DESeq2", version = '1.16.0')}
 
 if (!require("readxl", quietly = TRUE)){
    install.packages("readxl", version = '1.4.3')}
@@ -34,6 +34,7 @@ library("ggrepel")
 
 #chemin du répertoire du dossier 
 path <- paste(getwd(),"/", sep = "")
+
 #chemin du dossier des fichiers de comptage
 data_dir <- paste(path,"featureCounts_files", sep = "")
 print(data_dir)
@@ -82,11 +83,11 @@ metadata <- data.frame(
   row.names = colnames(all_counts)
 )
 
-## Check that match metadata and counts data
+## Vérifier que metadata et counts data correspondent
 all(colnames(all_counts) %in% rownames(metadata))
 all(colnames(all_counts) == rownames(metadata))
 
-## Create DESeq2Dataset object
+## Creation objet DESeq2Dataset
 dds <- DESeqDataSetFromMatrix(countData = all_counts, 
                               colData = metadata, 
                               design = ~condition)
@@ -99,9 +100,7 @@ res <- results(dds, alpha = 0.05) # alpha 0.05 par dépit
 #Affichage du résultat mean (FIG 3 SUPP)
 png(
   filename = paste(
-    path,"Mean_of_normalized_counts_log_fold_change_final.png"),
-    width = 1080, 
-    height = 1080)
+    path,"results/Mean_of_normalized_counts_log_fold_change_TEST.png"))
 
 plotMA(
   object = res,
@@ -117,35 +116,36 @@ dev.off()
 # Source : https://www.genome.jp/kegg-bin/get_htext?sao00001.keg
 # Étape 1 : Récupération des informations générales sur les gènes de traduction depuis KEGG
 kegg_translation <- KEGGREST::keggGet(
-  c("sao03010", "sao00970")
+  c("sao03010", "sao00970", "sao03013", "sao03015", "sao03008")
 )
 
-#ajouter à la main "SAOUHSC_01203", "K03685" selon un collègue de promo
-#il manque peut-être aussi le code sao03012
-#kegg_sao03012 <- KEGGREST::keggGet("sao03012")
+factor_translation <- read.table("sao03012.keg", sep = ";")
+
+# Convertir les données en dataframe
+factor_translation_df <- data.frame(V1 = factor_translation, stringsAsFactors = FALSE)
+
+# Extraire les identifiants SAOUHSC_
+identifiants <- str_extract_all(factor_translation_df$V1, "\\bSAOUHSC_\\d+\\b")
+
+# Afficher les noms de gènes extraits
+factor_translation_gene_name <- unlist(identifiants)
 
 # Extraire les identifiants des gènes (généralement dans la clé 'GENE' de chaque élément)
 gene_ids <- unique(unlist(lapply(kegg_translation, function(x) x$GENE)))
 
+genes_translation_final <- c(factor_translation_gene_name, gene_ids)
+
 # Vérification des identifiants des gènes extraits
-head(gene_ids)
+head(genes_translation_final)
 
 genes_name_file  <- read_excel(
   "GeneSpecificInformation_NCTC8325.xlsx")
 head(genes_name_file)
 
-################### JE CROIS QUE CELA N'EST PAS NÉCESSAIRE #######################
-# Nettoyer les identifiants des gènes pour garder uniquement le nom du gène
-# On utilise une expression régulière pour enlever tout ce qui suit un point-virgule ou les crochets
-# gene_ids_clean <- gsub(";.*", "", gene_ids)  # Retirer ce qui suit un point-virgule
-# gene_ids_clean <- gsub("\\[.*\\]", "", gene_ids_clean)  # Retirer ce qui est entre crochets
-
-# Affichage des premiers identifiants nettoyés
-# head(gene_ids_clean)
-##################################################################################
+res_filtered <- res[rownames(res) %in% genes_translation_final, ]
 
 # Filtrage du dataframe "res" pour ne conserver que les lignes correspondant aux gènes nettoyés
-res_filtered <- res[rownames(res) %in% genes_name_file$`locus tag`, ]
+# res_filtered <- res[rownames(res) %in% genes_name_file$`locus tag`, ]
 
 # Vérification du résultat
 head(res_filtered)
@@ -166,7 +166,7 @@ head(res_final)
 
 # Liste des gènes à annoter
 genes_to_label <- c("frr", "infA", "tsf", "infC", "infB", "pth")
-
+View(res_final)
 #df_labels <- res_final %>% filter(res_final$`symbol` %in% genes_to_label)
 res_final <- res_final %>%
   mutate(true_symbol = ifelse(res_final$symbol %in% genes_to_label, TRUE, FALSE))
@@ -178,35 +178,33 @@ res_final <- res_final %>% mutate(is_RNA_synthetase = row_number() %in% RNA_synt
 
 #Création attribut "log2_baseMean"
 res_final$log2_baseMean <- log2(res_final$baseMean + 1) # Ajouter 1 pour éviter les problèmes avec les valeurs nulles
-
+dim(res_final)
 #Création attribut "significance"
 res_final <- res_final %>%
-  mutate(significance = ifelse(pvalue < 0.05, "Non-significant", "Significant"))
+  mutate(significance = ifelse(pvalue < 0.05, "Significant", "Non-significant"))
 
 save.image(file = "save_file.RData")
 load("save_file.RData")
-
+dim(res_final)
 #Creation de l'image
 png(
   filename = paste(
-    path,"log_base_mean_log_fold_change_final_v1.png"),
-    width = 1080, 
-    height = 1080)
+    path,"log_base_mean_log_fold_change_final_v1.png"))
 
 # Créer le graphique avec le log2(baseMean) sur l'axe X
 ggplot(res_final, aes(x = log2_baseMean, y = log2FoldChange)) + 
-  # Couche pour tous les points (sans contour spécifique)
-  geom_point(aes(color = significance, shape = is_RNA_synthetase), size = 3) +
-   # Couche pour les points "is_RNA_synthetase" (avec contour noir)
+  # Couche pour les points "is_RNA_synthetase" (avec contour noir)
   geom_point(
     aes(shape = is_RNA_synthetase),
     data = res_final %>% filter(is_RNA_synthetase),  # Filtrer seulement les RNA synthetase
     shape = 21,          # Cercle avec contour
     size = 3,            # Taille du point avec contour
     color = "black",     # Contour noir
-    fill = "red",        # Remplissage des points RNA synthetase (peut être ajusté)
-    stroke = 1.2         # Épaisseur du contour
+    fill = "#FFFFFF00",        # Remplissage des points RNA synthetase (peut être ajusté)
+    stroke = 1.2    # Épaisseur du contour
   ) +
+  # Couche pour tous les points (sans contour spécifique)
+  geom_point(aes(color = significance, shape = is_RNA_synthetase), size = 3) +
   geom_hline(yintercept = 0, linetype = "dashed") +
   scale_color_manual(
     values = c("Significant" = "red", "Non-significant" = "grey"), # Couleurs des points
@@ -215,39 +213,30 @@ ggplot(res_final, aes(x = log2_baseMean, y = log2FoldChange)) +
     values = c("TRUE" = 21, "FALSE" = 19),  # Différencier RNA synthetase (21) et autres (19)
     name = "RNA Synthetase"  # Légende pour les points avec/without RNA synthetase
   ) +
-  geom_text_repel(
-    data = res_final %>% filter(true_symbol == TRUE),  # Filtrer pour annoter seulement certains gènes
-    aes(label = symbol),
-    size = 5,  # Taille du texte
-    max.overlaps = Inf  # Évite les chevauchements
-  ) +
+    geom_text_repel(data = res_final %>% filter(true_symbol == TRUE), aes(x=log2_baseMean, y=log2FoldChange, label=symbol), show.legend=FALSE, size=3, box.padding=4, max.overlaps=2000)
+   +
   labs(
     x = "Log₂ base Mean", 
     y = "Log₂ Fold Change") +  # Modifier l'étiquette de l'axe X
-  theme_minimal() # Appliquer un thème minimal
-  # geom_segment(
-  #   data = df_labels,  # Utiliser uniquement les gènes sélectionnés
-  #   aes(
-  #     x = log2_baseMean, 
-  #     y = log2FoldChange, 
-  #     xend = log2_baseMean, 
-  #     yend = log2FoldChange
-  # ))
-  #scale_fill_manual(values = c("TRUE" = "red", "FALSE" = "grey")) # Couleur des points (rouge pour aa-tRNA)
-  #ggtitle("Graphique de Log2 baseMean vs log2FoldChange") + # Ajouter un titre au graphique
-  # geom_text(aes(label = res_final$`symbol`), vjust = -1)
+  theme_minimal() + # Appliquer un thème minimal
+  scale_y_continuous(
+    breaks = seq(-6, 6, 1),  # Intervalles des graduations
+    limits = c(-6, 6)        # Limites des ordonnées
+  ) +
+  scale_x_continuous(
+    breaks = seq(4, 18, 2),  # Intervalles des graduations
+    limits = c(4, 18)        # Limites des abscisses
+  )
 
 #Fin de la modification de l'image
 dev.off()
 ########################################
 png(
   filename = paste(
-    path,"PCA_plot_v1.png"),
-    width = 1080, 
-    height = 1080)
+    path,"PCA_plot_v1.png"))
 
 #PCA plot
-rld <- rlog(dds)
+rld <- rlog(dds) #normalisation (stabilisation de la variance)
 plotPCA(rld)
 
 dev.off()
@@ -290,9 +279,7 @@ geom_text_repel(aes(label = res_final$Expression), size = 2.5)
 
 png(
   filename = paste(
-    path,"volcano_plot_v1.png"),
-    width = 1080, 
-    height = 1080)
+    path,"volcano_plot_v1.png"))
 
 volcano_plot_final
 
