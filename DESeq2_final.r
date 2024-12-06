@@ -1,6 +1,6 @@
 #Vérification de la présence des bonnes librairies sinon installation 
 if (!require("BiocManager", quietly = TRUE)){
-   install.packages("BiocManager")}#, version = '1.30.25')}
+   install.packages("BiocManager", version = '1.30.25')}
 
 if (!require("EnrichmentBrowser", quietly = TRUE)){
    install.packages("EnrichmentBrowser", version = '2.36.0')}
