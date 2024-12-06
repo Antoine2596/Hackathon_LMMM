@@ -1,0 +1,141 @@
+CHANGES IN VERSION 1.8.0
+------------------------
+
+NEW FEATURES
+
+    o Add 'chunk_dim' and 'level' arguments to saveHDF5SummarizedExperiment().
+
+    o Add coercion from ExpressionSet to SummarizedExperiment.
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+DEPRECATED AND DEFUNCT
+
+    o Remove 'force' argument from seqinfo() and seqlevels() setters (the
+      argument got deprecated in BioC 3.5 in favor of new and more flexible
+      'pruning.mode' argument).
+
+BUG FIXES
+
+    o Coercion from SummarizedExperiment to RangedSummarizedExperiment was
+      losing the metadata columns. Fixed now.
+
+    o Fix cbind() and rbind() of SummarizedExperiment objects when some of the
+      assays are DataFrame or data.frame objects.
+
+    o '$' completion on SummarizedExperiment works in RStudio and on
+      RangedSummarizedExperiment.
+
+
+CHANGES IN VERSION 1.6.0
+------------------------
+
+NEW FEATURES
+
+    o Add saveHDF5SummarizedExperiment() and loadHDF5SummarizedExperiment() for
+      saving/loading HDF5-based SummarizedExperiment objects to/from disk.
+
+DEPRECATED AND DEFUNCT
+
+    o Remove SummarizedExperiment0 class (was introduced to ease transition
+      from old SummarizedExperiment class defined in GenomicRanges to new
+      RangedSummarizedExperiment class defined in SummarizedExperiment package).
+
+
+CHANGES IN VERSION 1.4.0
+------------------------
+
+NEW FEATURES
+
+    o Add makeSummarizedExperimentFromDataFrame() function.
+
+    o Add "acbind" and "arbind" methods for Matrix objects.
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o Speed up "cbind" method for SummarizedExperiment objects based on a
+      suggestion by Peter Hickey.
+
+DEPRECATED AND DEFUNCT
+
+    o Remove exptData() getter and setter (were defunct in BioC 3.3).
+
+BUG FIXES
+
+
+CHANGES IN VERSION 1.2.0
+------------------------
+
+NEW FEATURES
+
+    o Add 'rowData' argument to SummarizedExperiment() constructor. This allows
+      the user to supply the row data at construction time.
+
+    o The SummarizedExperiment() constructor function and the assay() setter
+      now both take any matrix-like object as long as the resulting
+      SummarizedExperiment object is valid.
+
+    o Support r/cbind'ing of SummarizedExperiment objects with assays of
+      arbitrary dimensions (based on a patch by Pete Hickey).
+
+    o Add "is.unsorted" method for RangedSummarizedExperiment objects.
+
+    o NULL colnames() supported during SummarizedExperiment construction.
+
+    o readKallisto() warns early when files need names.
+
+    o base::rank() gained a new 'ties.method="last"' option and base::order()
+      a new argument ('method') in R 3.3. Thus so do the "rank" and "order"
+      methods for RangedSummarizedExperiment objects.
+
+SIGNIFICANT USER-VISIBLE CHANGES
+
+    o Re-introduce the rowData() accessor (was defunt in BioC 3.2) as an alias
+      for mcols() and make it the preferred way to access the row data. There
+      is now a pleasant symmetry between rowData and colData.
+
+    o Rename SummarizedExperiment0 class -> SummarizedExperiment.
+
+    o Improved vignette.
+
+    o Remove updateObject() method for "old" SummarizedExperiment objects.
+
+DEPRECATED AND DEFUNCT
+
+    o exptData() is now defunct, metadata() should be used instead.
+
+BUG FIXES
+
+    o Fix bug in "sort" method for RangedSummarizedExperiment objects when
+      'ignore.strand=TRUE' (the argument was ignored).
+
+    o Fix 2 bugs when r/cbind'ing SummarizedExperiment objects:
+      - r/cbind'ing assays without names would return only the first element.
+        See https://stat.ethz.ch/pipermail/bioc-devel/2015-November/008318.html
+      - r/cbind'ing assays with names in different order would stop() with
+        'Assays must have the same names()"
+
+    o Fix validity method for SummarizedExperiment objects reporting incorrect
+      numbers when the nb of cols in assay(x) doesn't match the nb of rows in
+      colData(x).
+
+    o assay colnames() must agree with colData rownames()
+
+    o Fix bug where assays(se, withDimnames=TRUE) was dropping the dimnames of
+      the 3rd and higher-order dimensions of the assays. Thanks to Pete Hickey
+      for catching this and providing a patch.
+
+    o A couple of minor tweaks to the rowData() setter to make it behave
+      consistently with mcols()/elementMetadata() setters for Vector objects
+      in general.
+
+
+CHANGES IN VERSION 0.3.*
+------------------------
+
+NEW FEATURES
+
+    o readKallisto() and readKallistoBootstrap() input kallisto
+      transcript quantification output into SummarizedExperiment (and
+      other) instances.
+

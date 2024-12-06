@@ -1,0 +1,93 @@
+// Copyright (c) 2020, Control Command Inc. All rights reserved.
+// Copyright (c) 2019-2021, Sylabs Inc. All rights reserved.
+// This software is licensed under a 3-clause BSD license. Please consult the
+// LICENSE.md file distributed with the sources of this project regarding your
+// rights to use or distribute this software.
+
+// Package syfs provides functions to access singularity's file system
+// layout.
+package syfs
+
+import (
+	"os"
+	"path/filepath"
+	"sync"
+
+	"github.com/sylabs/singularity/v4/internal/pkg/util/user"
+	"github.com/sylabs/singularity/v4/pkg/sylog"
+)
+
+// Configuration files/directories.
+const (
+	RemoteConfFile = "remote.yaml"
+	RemoteCache    = "remote-cache"
+	DockerConfFile = "docker-config.json"
+	singularityDir = ".singularity"
+	configDirEnv   = "SINGULARITY_CONFIGDIR"
+)
+
+// cache contains the information for the current user
+var cache struct {
+	sync.Once
+	configDir string // singularity user configuration directory
+}
+
+// ConfigDir returns the directory where the singularity user
+// configuration and data is located.
+func ConfigDir() string {
+	cache.Do(func() {
+		cache.configDir = configDir()
+		sylog.Debugf("Using singularity directory %q", cache.configDir)
+	})
+
+	return cache.configDir
+}
+
+func configDir() string {
+	configDir := os.Getenv(configDirEnv)
+	if configDir != "" {
+		return configDir
+	}
+
+	user, err := user.CurrentOriginal()
+	if err != nil {
+		sylog.Warningf("Could not lookup the current user's information: %s", err)
+
+		cwd, err := os.Getwd()
+		if err != nil {
+			sylog.Warningf("Could not get current working directory: %s", err)
+			return singularityDir
+		}
+
+		return filepath.Join(cwd, singularityDir)
+	}
+
+	return filepath.Join(user.Dir, singularityDir)
+}
+
+func RemoteConf() string {
+	return filepath.Join(ConfigDir(), RemoteConfFile)
+}
+
+func RemoteCacheDir() string {
+	return filepath.Join(ConfigDir(), RemoteCache)
+}
+
+func DockerConf() string {
+	return filepath.Join(ConfigDir(), DockerConfFile)
+}
+
+// ConfigDirForUsername returns the directory where the singularity
+// configuration and data for the specified username is located.
+func ConfigDirForUsername(username string) (string, error) {
+	u, err := user.GetPwNam(username)
+	if err != nil {
+		return "", err
+	}
+
+	if cu, err := user.CurrentOriginal(); err == nil && u.Name == cu.Name {
+		return ConfigDir(), nil
+	}
+
+	return filepath.Join(u.Dir, singularityDir), nil
+}

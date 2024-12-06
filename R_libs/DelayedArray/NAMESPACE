@@ -1,0 +1,171 @@
+import(methods)
+importFrom(stats, setNames,
+                  dbinom, pbinom, qbinom,
+                  dpois, ppois, qpois,
+                  dlogis, plogis, qlogis)
+import(BiocGenerics)
+import(S4Vectors)
+import(IRanges)
+import(matrixStats)
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Export S4 classes
+###
+
+exportClasses(
+    Array,
+    ArrayViewport, ArrayGrid, ArrayArbitraryGrid, ArrayRegularGrid,
+    DelayedArray, DelayedMatrix,
+    RealizationSink, arrayRealizationSink,
+    RleArraySeed, SolidRleArraySeed, RleRealizationSink, ChunkedRleArraySeed,
+    RleArray, RleMatrix
+)
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Export S3 methods
+###
+
+S3method(as.array, DelayedArray)
+
+S3method(as.character, ArrayGrid)
+S3method(as.character, DelayedArray)
+
+S3method(as.complex, DelayedArray)
+
+S3method(as.data.frame, DelayedArray)
+
+S3method(as.integer, DelayedArray)
+
+S3method(as.logical, DelayedArray)
+
+S3method(as.matrix, DelayedArray)
+
+S3method(as.numeric, DelayedArray)
+
+S3method(as.raw, DelayedArray)
+
+S3method(as.vector, DelayedArray)
+
+S3method(mean, DelayedArray)
+
+S3method(split, DelayedArray)
+
+### We also export them thru the export() directive so that (a) they can be
+### called directly, (b) tab-completion on the name of the generic shows them,
+### and (c) methods() doesn't asterisk them.
+
+export(
+    as.array.DelayedArray,
+
+    as.character.ArrayGrid,
+    as.character.DelayedArray,
+
+    as.complex.DelayedArray,
+
+    as.data.frame.DelayedArray,
+
+    as.integer.DelayedArray,
+
+    as.logical.DelayedArray,
+
+    as.matrix.DelayedArray,
+
+    as.numeric.DelayedArray,
+
+    as.raw.DelayedArray,
+
+    as.vector.DelayedArray,
+
+    mean.DelayedArray,
+
+    split.DelayedArray
+)
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Export S4 methods for generics not defined in DelayedArray
+###
+
+exportMethods(
+    ## Methods for generics defined in the base package:
+    length, names, "names<-",
+    dim, "dim<-", dimnames, "dimnames<-",
+    "[", "[[", "[<-",
+    lengths,
+    as.array, as.matrix, as.data.frame, as.vector,
+    as.logical, as.integer, as.numeric, as.complex, as.character, as.raw,
+    c, split,
+    drop, t,
+    is.na, is.finite, is.infinite, is.nan,
+    "!",
+    #"+", "-", "*", "/", "^", "%%", "%/%",  # "Arith" group generic
+    "==", "!=", "<=", ">=", "<", ">",       # "Compare" group generic
+    anyNA, which,
+    max, min, range, sum, prod, any, all,   # "Summary" group generic
+    mean,
+    round, signif,
+    rowSums, colSums, rowMeans, colMeans,
+    nchar, tolower, toupper,
+
+    ## Methods for generics defined in the methods package:
+    coerce, show,
+
+    ## Methods for generics defined in the stats package:
+    dbinom, pbinom, qbinom,
+    dpois, ppois, qpois,
+    dlogis, plogis, qlogis,
+
+    ## Methods for generics defined in the BiocGenerics package:
+    cbind, rbind,
+
+    ## Methods for generics defined in the S4Vectors package:
+    isEmpty,
+
+    ## Methods for generics defined in the IRanges package:
+    ranges, start, end, width,
+    splitAsList
+)
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Export non-generic functions
+###
+
+export(
+    ArrayViewport, makeNindexFromArrayViewport,
+    ArrayArbitraryGrid, ArrayRegularGrid,
+    supportedRealizationBackends, getRealizationBackend, setRealizationBackend,
+    write_array_to_sink,
+    RleArray
+)
+
+
+### - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+### Export S4 generics defined in DelayedArray + export corresponding methods
+###
+
+export(
+    arbind, acbind,
+    refdim, isLinear,
+    subset_seed_as_array,
+    matrixClass, DelayedArray, seed, type,
+    chunk_dim, write_block_to_sink, close,
+    realize,
+    pmax2, pmin2, apply,
+    rowMaxs, colMaxs, rowMins, colMins, rowRanges, colRanges
+)
+
+### Exactly the same list as above.
+exportMethods(
+    arbind, acbind,
+    refdim, isLinear,
+    subset_seed_as_array,
+    matrixClass, DelayedArray, seed, type,
+    chunk_dim, write_block_to_sink, close,
+    realize,
+    pmax2, pmin2, apply,
+    rowMaxs, colMaxs, rowMins, colMins, rowRanges, colRanges
+)
+

@@ -1,0 +1,51 @@
+# Commencez par spécifier l'image de base
+BootStrap: docker
+From: ubuntu:18.04
+
+# Nom du conteneur
+%labels
+  Author YourName
+  Version 1.0
+
+# Définition des variables d'environnement
+%environment
+  export LANG=en_US.UTF-8
+  export LC_ALL=en_US.UTF-8
+
+# Installation des dépendances systèmes nécessaires pour R
+%post
+  # Mettre à jour le système et installer les outils de base
+  apt-get update && apt-get upgrade -y
+  apt-get install -y \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    libxml2-dev \
+    g++ \
+    make \
+    libcurl4-openssl-dev \
+    wget \
+    ca-certificates
+
+  # Installation de R 3.4.1
+  wget https://cran.r-project.org/bin/linux/ubuntu/pool/cran-r/r/r-base_3.4.1-1xenial_amd64.deb
+  dpkg -i r-base_3.4.1-1xenial_amd64.deb
+  apt-get install -f -y # Pour résoudre les éventuelles dépendances manquantes
+
+  # Installer les dépendances de R (Bioconductor, remotes, etc.)
+  R -e "install.packages('remotes')"
+
+  # Installer des versions spécifiques des packages nécessaires
+  R -e "remotes::install_version('vctrs', version = '0.3.4')"
+  R -e "remotes::install_version('blob', version = '1.1.2')"
+  R -e "remotes::install_version('memoise', version = '1.1.0')"
+  R -e "remotes::install_version('RSQLite', version = '2.0.0')"
+  R -e "remotes::install_version('AnnotationDbi', version = '1.40.0')"
+  R -e "remotes::install_version('XML', version = '3.98-1.19')"
+
+  # Installer Bioconductor et d'autres packages
+  R -e "install.packages('BiocManager')"
+  R -e "BiocManager::install(version = '3.7')"
+  R -e "BiocManager::install('DESeq2')"
+  R -e "BiocManager::install('AnnotationDbi')"
+
+# Fin de la recette

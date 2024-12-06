@@ -5,12 +5,6 @@
 
 rm bowtie_files/*sam
 
-if test -f bowtie_v0.12.7.sif; then
-  echo "File exists."
-else
-   echo "File NO EXIST WTF"
-   sudo singularity build bowtie_v0.12.7.sif def_files/install_bowtie.def
-fi
 
 #singularity exec bowtie_v0.12.7.sif bowtie
 
