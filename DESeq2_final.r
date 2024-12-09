@@ -85,7 +85,7 @@ plotMA(
   colSig = "red",
   colNonSig = "black",
   xlab = "Mean of normalized counts",
-  ylab = "Log"[2] ~"fold change",
+  ylab = "Log"[2] ~"fold change"
  )
 
 #Fin des modifications de l'image et enregistrement
