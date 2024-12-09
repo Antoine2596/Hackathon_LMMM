@@ -49,9 +49,9 @@ Pour exécuter le pipeline :
    ```
    git clone git@github.com:Antoine2596/Hackathon_LMMM.git
    ```
-2. Activez l'environnement conda de base :  
+2. Activez snakemake contenu dans l'environnement conda :  
    ```
-   conda activate
+   conda activate snakemake
    ```
 
 3. Lancez le pipeline avec la commande suivante :
@@ -69,6 +69,6 @@ Cette commande utilise tous les threads disponibles sur votre machine. Si votre 
 Pour exécuter le pipeline de manière automatique :
 1. Lancez le script `run.sh` :
    `./run.sh`
-Ce script activera automatiquement conda avant d'exécuter le pipeline complet.
+Ce script exécutera le pipeline complet tant que SingularityCE est installé et Snakemake activé.
 
    
