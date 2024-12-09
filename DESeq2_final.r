@@ -195,7 +195,7 @@ res_final <- res_final %>%
 #Affichage de la figure 3c
 png(
   filename = paste(
-    path,"log_base_mean_log_fold_change_final.png"))
+    path,"log_base_mean_log_fold_change.png"))
 
 # Créer le graphique avec le log2(baseMean) sur l'axe X
 ggplot(res_final, aes(x = log2_baseMean, y = log2FoldChange)) + 
@@ -275,7 +275,7 @@ geom_text_repel(aes(label = res_final$Expression), size = 2.5)
 
 png(
   filename = paste(
-    path,"volcano_plot_v1.png"))
+    path,"Volcano_plot.png"))
 
 volcano_plot_final
 
