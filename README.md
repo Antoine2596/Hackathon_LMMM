@@ -1,22 +1,75 @@
 # Introduction
 
-Ce projet s'inscrit dans le cadre de l'UC Repro Hackathon du master AMI2B de l'Université Paris-Saclay. Il s'agit de s'approprier les notions de reproductibilité scientifique en reproduisant certaines figures obtenues par Peyrusson et al. dans "[Intracellular Staphylococcus aureus persisters upon antibiotic exposure](https://doi.org/10.1038/s41467-020-15966-7)".
+Ce projet s'inscrit dans le cadre de l'Unité d'Enseignement ReproHackathon du master AMI2B de l'Université Paris-Saclay.  
+Il vise à explorer les notions de reproductibilité scientifique en reproduisant certaines figures obtenues par Peyrusson et al. dans leur publication :  
+["Intracellular Staphylococcus aureus persisters upon antibiotic exposure"](https://doi.org/10.1038/s41467-020-15966-7).
+
+Le projet consiste en la création d'un pipeline bioinformatique reproductible permettant de répliquer les analyses décrites dans l'article.
+
+---
 
 # Prérequis
 
-Afin d'obtenir les résultats, il est nécessaire de se placer dans une machine sous Ubuntu 20.04 sur lequel sont installés Snakemake (le pipeline a été développé pour snakemake 8.25.3) et Singularity-CE (la version Afin d'obtenir les résultats, il est nécessaire de se placer dans une machine sous Ubuntu 20.04 sur lequel sont installés Snakemake (le pipeline a été développé pour snakemake 8.25.3) et Singularity-CE (la version 4.2.0 a été utilisée). Il est également nécessaire de disposer d'au moins 4 threads et 14 gigaoctets de mémoire vive. Cloner le dépôt Github fournira tous les fichiers nécessaires à l'exécution, à savoir :
+Pour exécuter le pipeline et reproduire les résultats, deux options sont disponibles :  
 
- - le snakefile contenant le pipeline
- - le script R permettant la création des images finales
- - un fichier de données génétiques en provenance de KEGG, dont le téléchargement ne se fait pas comme prévu dans le script (l'erreur venant du site)
- - un fichier d'information génétiques xlsx dont le site n'autorise pas un téléchargement direct sans passer par une interface utilisateur
- - un fichier run.sh permettant de lancer directement l'exécution du pipeline sans passer par la ligne de commande
+1. **Utiliser vos propres ressources** :  
+   - Snakemake version **8.25.3**  
+   - SingularityCE version **4.2.0** (ou Singularity 4.2.0)  
+   - Git  
+   - Conda  
+   - La machine doit disposer d’au moins **4 threads** et **14 Go de mémoire vive**.
 
-Le dépôt contient également les recettes de création des conteneurs singularity utilisés dans le snakefile ; ceux-ci étant hébergés sur Zenodo et téléchargés à la volée, les recettes ne sont présente que pour pouvoir inspecter leur contenu.
+2. **Utiliser une machine virtuelle via Biosphère** :  
+   - Sélectionnez l'appliance [BioPipes](https://biosphere.france-bioinformatique.fr/catalogue/appliance/119/) sous Ubuntu 22.04, qui inclut Snakemake (préconfiguré pour la version 8.25.3).  
+   - Installez SingularityCE en suivant les instructions du [wiki d'installation](https://github.com/Antoine2596/Hackathon_LMMM/wiki/singularity%E2%80%90installation).  
+   - Installez Git avec la commande suivante après connexion à la machine virtuelle :  
+     ```
+     sudo apt-get install git
+     ```
+   - Assurez-vous que la machine virtuelle dispose des ressources nécessaires : **au moins 4 threads et 14 Go de RAM**.
 
-# Exécution
-Une fois snakemake activé, la commande pour lancer le pipeline est la suivante :
+---
 
-    snakemake --cores all --use-singularity
-   Cela permet à snakemake d'utiliser tous les threads disponibles sur la machine. S'il la machine dispose d'au moins 24 coeurs, elle sera en mesure de lancer tous les jobs s'appliquant à une séquence d'ADN en parallèle.
-   L'exécution du pipeline peut également s'effectuer en exécutant `run.sh` .
+# Structure du répertoire GitHub
+
+Ce dépôt contient :  
+- **`Snakefile`** : le fichier décrivant le pipeline d'analyse.  
+- **Script R** : utilisé pour la création des images finales à partir des résultats.  
+- **Fichier KEGG** : fichier de données génétiques requis mais non téléchargeable directement via le script, en raison de restrictions côté serveur.  
+- **Fichier `.xlsx`** : contient des informations génétiques, non téléchargeables automatiquement sans interaction manuelle avec l'interface du site.  
+- **`run.sh`** : script bash pour lancer l'exécution automatique du pipeline.  
+- **Recettes des conteneurs Singularity** : les fichiers de définition utilisés pour créer les conteneurs. Ces derniers sont hébergés sur Zenodo et téléchargés automatiquement par le pipeline.
+
+---
+
+# Exécution manuelle
+
+Pour exécuter le pipeline :  
+
+1. Clonez ce dépôt GitHub :  
+   ```
+   git clone git@github.com:Antoine2596/Hackathon_LMMM.git
+   ```
+2. Activez l'environnement conda de base :  
+   ```
+   conda activate
+   ```
+
+3. Lancez le pipeline avec la commande suivante :
+   ```
+   snakemake --cores all --use-singularity
+   ```
+Cette commande utilise tous les threads disponibles sur votre machine. Si votre machine dispose d’au moins 24 cœurs, elle pourra paralléliser les tâches pour traiter plusieurs séquences d'ADN en simultané.
+
+> L'option --use-singularity permet d'exécuter chaque étape dans son conteneur dédié pour garantir la reproductibilité.
+
+---
+
+# Exécution automatique
+
+Pour exécuter le pipeline de manière automatique :
+1. Lancez le script `run.sh` :
+   `./run.sh`
+Ce script activera automatiquement conda avant d'exécuter le pipeline complet.
+
+   
