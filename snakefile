@@ -19,7 +19,7 @@ rule all:
         "results/Mean_of_normalized_counts_log_fold_change.png",
         "results/log_base_mean_log_fold_change.png",
         "results/PCA_plot.png",
-        "results/volcano_plot.png"
+        "results/Volcano_plot.png"
 
 
 #Téléchargement du génome de référence
@@ -136,7 +136,7 @@ rule deseq2:
         "results/Mean_of_normalized_counts_log_fold_change.png",   #pas de sens de mettre un wildcard car le script sort toutes les images d'un coup
         "results/log_base_mean_log_fold_change.png",
         "results/PCA_plot.png",
-        "results/volcano_plot.png"
+        "results/Volcano_plot.png"
     container:
         "https://zenodo.org/records/14293893/files/R-4.4.2.sif?download=1"
     shell:
