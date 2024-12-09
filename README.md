@@ -1,8 +1,7 @@
 # Introduction
 
 Ce projet s'inscrit dans le cadre de l'Unité d'Enseignement ReproHackathon du master AMI2B de l'Université Paris-Saclay.  
-Il vise à explorer les notions de reproductibilité scientifique en reproduisant certaines figures obtenues par Peyrusson et al. dans leur publication :  
-["Intracellular Staphylococcus aureus persisters upon antibiotic exposure"](https://doi.org/10.1038/s41467-020-15966-7).
+Il vise à explorer les notions de reproductibilité scientifique en reproduisant certaines figures obtenues par Peyrusson et al. dans leur publication :  ["Intracellular Staphylococcus aureus persisters upon antibiotic exposure"](https://doi.org/10.1038/s41467-020-15966-7).
 
 Le projet consiste en la création d'un pipeline bioinformatique reproductible permettant de répliquer les analyses décrites dans l'article.
 
