@@ -1,0 +1,26 @@
+Bootstrap: docker
+From: rocker/r-base:4.4.2
+
+%post
+    apt-get update && apt-get install -y \
+        libcurl4-openssl-dev \
+        libssl-dev \
+        libxml2-dev \
+        libfontconfig1-dev \
+        libharfbuzz-dev \
+        libfribidi-dev \
+        libfreetype6-dev \
+        libpng-dev \
+        libtiff5-dev \
+        libjpeg-dev \
+        && apt-get clean
+
+    Rscript -e 'install.packages("BiocManager", repos="https://cran.r-project.org")'
+    Rscript -e 'BiocManager::install(c("EnrichmentBrowser","DESeq2"))'
+    Rscript -e 'install.packages(c("readxl","tidyverse","ggplot2","dplyr","ggrepel"), repos="https://cran.r-project.org")'
+
+%environment
+    export PATH="/usr/local/bin:${PATH}"
+
+%runscript
+    exec R "$@"
