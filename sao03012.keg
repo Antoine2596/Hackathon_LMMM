@@ -1,0 +1,52 @@
++D	Translation factors	KO
+#<h2><a href="/kegg/brite.html"><img src="/Fig/bget/kegg3.gif" align="middle" border=0></a>&nbsp; Translation Factors - Staphylococcus aureus subsp. aureus NCTC8325</h2>
+%<!-- w=600, -->
+!
+A<b>Eukaryotic type</b>
+B  Initiation factors
+C    eIF-1
+C    eIF-2
+C    eIF-2A
+C    eIF-2B
+C    eIF-2D
+C    eIF-5
+C    eIF-6
+C    eIF-3
+C    eIF-4
+C    MTIFs
+D      SAOUHSC_01246 infB; translation initiation factor IF-2	K02519 infB; translation initiation factor IF-2 
+D      SAOUHSC_01786 infC; translation initiation factor IF-3	K02520 infC; translation initiation factor IF-3 
+C    Initiation associated factors
+D      SAOUHSC_02274 ABC transporter ATP-binding protein	K06158 ABCF3; ATP-binding cassette, subfamily F, member 3 
+B  Elongation factors
+C    SAOUHSC_01234 tsf; elongation factor Ts	K02357 tsf; elongation factor Ts 
+C    SAOUHSC_00530 tuf; elongation factor Tu	K02358 tuf; elongation factor Tu 
+C    SAOUHSC_00529 fusA; elongation factor G	K02355 fusA; elongation factor G 
+C    Elongation associated factors
+B  Release factors
+C    SAOUHSC_02359 prfA; peptide chain release factor 1	K02835 prfA; peptide chain release factor 1 
+C    SAOUHSC_01236 frr; ribosome recycling factor	K02838 frr; ribosome recycling factor 
+C    SAOUHSC_02358 HemK family modification methylase	K02493 hemK; release factor glutamine methyltransferase [EC:2.1.1.297] 
+C    SAOUHSC_00475 peptidyl-tRNA hydrolase	K01056 PTH1; peptidyl-tRNA hydrolase, PTH1 family [EC:3.1.1.29] 
+#
+A<b>Prokaryotic type</b>
+B  Initiation factors
+C    SAOUHSC_02489 infA; translation initiation factor IF-1	K02518 infA; translation initiation factor IF-1 
+C    SAOUHSC_01246 infB; translation initiation factor IF-2	K02519 infB; translation initiation factor IF-2 
+C    SAOUHSC_01786 infC; translation initiation factor IF-3	K02520 infC; translation initiation factor IF-3 
+B  Elongation factors
+C    SAOUHSC_01234 tsf; elongation factor Ts	K02357 tsf; elongation factor Ts 
+C    SAOUHSC_00530 tuf; elongation factor Tu	K02358 tuf; elongation factor Tu 
+C    SAOUHSC_00529 fusA; elongation factor G	K02355 fusA; elongation factor G 
+C    SAOUHSC_01625 elongation factor P	K02356 efp; elongation factor P 
+B  Release factors
+C    SAOUHSC_02359 prfA; peptide chain release factor 1	K02835 prfA; peptide chain release factor 1 
+C    SAOUHSC_00771 peptide chain release factor 2	K02836 prfB; peptide chain release factor 2 
+C    SAOUHSC_00956 prfC; peptide chain release factor 3	K02837 prfC; peptide chain release factor 3 
+C    SAOUHSC_01236 frr; ribosome recycling factor	K02838 frr; ribosome recycling factor 
+C    SAOUHSC_02358 HemK family modification methylase	K02493 hemK; release factor glutamine methyltransferase [EC:2.1.1.297] 
+C    SAOUHSC_00475 peptidyl-tRNA hydrolase	K01056 PTH1; peptidyl-tRNA hydrolase, PTH1 family [EC:3.1.1.29] 
+!
+#<hr>
+#[ <a href="/kegg/brite.html">BRITE</a> | <a href="/kegg/kegg2.html">KEGG2</a> | <a href="/kegg/">KEGG</a> ]<br>
+#Last updated: August 9, 2024
