@@ -12,7 +12,6 @@ path <- paste(getwd(),"/", sep = "")
 
 #chemin du dossier des fichiers de comptage
 data_dir <- paste(path,"featureCounts_files", sep = "")
-print(data_dir)
 
 #Sélection des fichiers feature_counts dans une liste
 count_files <- list.files(
@@ -68,38 +67,45 @@ dds <- DESeqDataSetFromMatrix(countData = all_counts,
                               design = ~condition)
 
 
-#Perform median of ratios method of normalization
+#Analyse différentielle d'expression
 dds <- DESeq(dds)
 res <- results(dds, alpha = 0.05) # alpha 0.05 par dépit
 
-#Affichage du résultat mean (FIG 3 SUPP)
+#Affichage de la figure 3 supp
+
+#Création d'une image au format png
 png(
-  filename = file.path(path, "results", "Mean_of_normalized_counts_log_fold_change.png"), width = 1600, height = 1600, res = 300)
+  filename = file.path(
+    path, "results", "Mean_of_normalized_counts_log_fold_change.png"), 
+    width = 1600, height = 1600, res = 300)
 
-
+#Affichage
 plotMA(
   object = res,
   colSig = "red",
   colNonSig = "black"
  )
 
+#Fin des modifications de l'image et enregistrement
 dev.off()
     
 #Affichage du résultat log (FIG 3)
 
-#On obtient les informations générales sur les gènes de translation (mais il en manque, voir commentaires ci-dessous)
+# Récupération des informations générales sur les gènes de traduction depuis KEGG
 # Source : https://www.genome.jp/kegg-bin/get_htext?sao00001.keg
-# Étape 1 : Récupération des informations générales sur les gènes de traduction depuis KEGG
 kegg_translation <- KEGGREST::keggGet(
   c("sao03010", "sao00970", "sao03013", "sao03015", "sao03008")
 )
 
+#Récupération des identifiants des facteurs de translations
+#Source "sao03012.keg" : https://www.genome.jp/kegg-bin/download_htext?htext=sao03012
 factor_translation <- read.table("sao03012.keg", sep = ";")
 
-# Convertir les données en dataframe
-factor_translation_df <- data.frame(V1 = factor_translation, stringsAsFactors = FALSE)
+# Convertir les identifiants des facteurs de translation en dataframe
+factor_translation_df <- data.frame(
+  V1 = factor_translation, stringsAsFactors = FALSE)
 
-# Extraire les identifiants SAOUHSC_
+# Extraire les identifiants débutant par SAOUHSC_..
 identifiants <- str_extract_all(factor_translation_df$V1, "\\bSAOUHSC_\\d+\\b")
 
 # Afficher les noms de gènes extraits
@@ -108,26 +114,21 @@ factor_translation_gene_name <- unlist(identifiants)
 # Extraire les identifiants des gènes (généralement dans la clé 'GENE' de chaque élément)
 gene_ids <- unique(unlist(lapply(kegg_translation, function(x) x$GENE)))
 
+#Fusion des 2 listes : factor_translation_gene_name et gene_ids
 genes_translation_final <- c(factor_translation_gene_name, gene_ids)
 
-# Vérification des identifiants des gènes extraits
-head(genes_translation_final)
-
+#Lecture du fichier de correspondance entre nom de gènes et leur symbole
+#Source : https://aureowiki.med.uni-greifswald.de/download_gene_specific_information
 genes_name_file  <- read_excel(
   "GeneSpecificInformation_NCTC8325.xlsx")
-head(genes_name_file)
 
+#Filtrage des gènes traduits
 res_filtered <- res[rownames(res) %in% genes_translation_final, ]
-
-# Filtrage du dataframe "res" pour ne conserver que les lignes correspondant aux gènes nettoyés
-
-# Vérification du résultat
-head(res_filtered)
 
 # Convertir "res_filtered" en dataframe
 res_filtered_df <- as.data.frame(res_filtered)
 
-# Fusionner "res_filtered_df" avec "genes_name_file" en utilisant "row.names(res_filtered_df)" et "locus tag"
+# Correspondance entre noms de gène et leur symbol et la présence de ARN synthétase
 res_final <- merge(
   res_filtered_df, 
   genes_name_file, 
@@ -135,32 +136,34 @@ res_final <- merge(
   by.y = "locus tag", 
   all.x = TRUE)
 
-# Vérification du résultat après la fusion
-head(res_final)
-
 # Liste des gènes à annoter
 genes_to_label <- c("frr", "infA", "tsf", "infC", "infB", "pth")
-res_final <- res_final %>%
-  mutate(true_symbol = ifelse(res_final$symbol %in% genes_to_label, TRUE, FALSE))
 
+#Création de l'attribut "true_symbol"
+res_final <- res_final %>%
+  mutate(true_symbol = ifelse(
+    res_final$symbol %in% genes_to_label, TRUE, FALSE))
+
+#Trouver les gènes qui ont le RNA synthetase
 RNA_synthetase <- c(grep('tRNA synthetase',res_final$product))
 
 #Création attribut "is_RNA_synthetase"
-res_final <- res_final %>% mutate(is_RNA_synthetase = row_number() %in% RNA_synthetase)
+res_final <- res_final %>% mutate(
+  is_RNA_synthetase = row_number() %in% RNA_synthetase)
 
 #Création attribut "log2_baseMean"
 res_final$log2_baseMean <- log2(res_final$baseMean + 1) # Ajouter 1 pour éviter les problèmes avec les valeurs nulles
-dim(res_final)
-#Création attribut "significance"
-res_final <- res_final %>%
-  mutate(significance = ifelse(pvalue < 0.05, "Significant", "Non-significant"))
 
-save.image(file = "save_file.RData")
-load("save_file.RData")
-dim(res_final)
-#Creation de l'image
+#Création attribut "significance"
+res_final <- res_final %>% mutate(
+  significance = ifelse(
+    padj < 0.05, "Significant", "Non-significant"))
+
+#Affichage de la figure 3c
 png(
-  filename = file.path(path, "results", "log_base_mean_log_fold_change.png"), width = 1600, height = 1600, res = 300)
+  filename = file.path(
+    path, "results", "log_base_mean_log_fold_change.png"), 
+    width = 1600, height = 1600, res = 300)
 
 # Créer le graphique avec le log2(baseMean) sur l'axe X
 ggplot(res_final, aes(x = log2_baseMean, y = log2FoldChange)) + 
@@ -201,19 +204,23 @@ ggplot(res_final, aes(x = log2_baseMean, y = log2FoldChange)) +
 
 #Fin de la modification de l'image
 dev.off()
-########################################
+
+#Affichage du PCA plot
 png(
-  filename = file.path(path, "results", "PCA_plot.png"), width = 1600, height = 1200, res = 300)
+  filename = file.path(
+    path, "results", "PCA_plot.png"), 
+    width = 1600, height = 1200, res = 300)
 
 #PCA plot
 rld <- rlog(dds) #normalisation (stabilisation de la variance)
 plotPCA(rld)
 
+#Fin de la modification de l'image
 dev.off()
 
-#Volcano plots
-# add an additional column that identifies a gene as unregulated, downregulated, or unchanged
-# note the choice of pvalue and log2FoldChange cutoff. 
+#Affichage de Volcano plot
+
+# Création d'un attribut "Expression" qui différencie les gènes comme "up-regulated", "down-regulated", or "unchanged"
 res_final <- res_final %>%
   mutate(
   Expression = case_when(log2FoldChange >= log(1) & padj <= 0.05 ~ "Up-regulated",
@@ -221,23 +228,7 @@ res_final <- res_final %>%
   TRUE ~ "Unchanged")
   )
 
-top <- 10
-# we are getting the top 10 up and down regulated genes by filtering the column Up-regulated and Down-regulated and sorting by the adjusted p-value. 
-top_genes <- bind_rows(
-  res_final %>%
-  filter(Expression == 'Up-regulated') %>%
-  arrange(padj, desc(abs(log2FoldChange))) %>%
-  head(top),
-  res_final %>%
-  filter(Expression == 'Down-regulated') %>%
-  arrange(padj, desc(abs(log2FoldChange))) %>%
-  head(top)
-  )
-# create a datframe just holding the top 10 genes
-Top_Hits = head(arrange(res_final,pvalue),10)
-Top_Hits
-
-#Up/DOwn Regulated
+#Création du graphique volcano plot
 volcano_plot_final <- ggplot(res_final, aes(log2FoldChange, -log(pvalue,10))) + # -log10 conversion
 geom_point(aes(color = Expression), size = 2/5) +
 # geom_hline(yintercept=-log10(0.05), linetype="dashed", linewidth = .4) +
@@ -248,8 +239,12 @@ xlim(-4.5, 4.5) +
 geom_text_repel(aes(label = res_final$Expression), size = 2.5)
 
 png(
-  filename = file.path(path, "results", "volcano_plot.png"), width = 1600, height = 1200, res = 300)
+  filename = file.path(
+    path, "results", "Volcano_plot.png"),
+    width = 1600, height = 1200, res = 300)
 
+#Appel variable affichage Volcano plot
 volcano_plot_final
 
+#Fin de la modification de l'image
 dev.off()
